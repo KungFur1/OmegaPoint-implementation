@@ -1,11 +1,11 @@
 import fastapi
-from app.JWT_auth.auth import AuthHandler
+from app.JWT_auth.authorization import authorization_wrapper
 
 router = fastapi.APIRouter()
 
 # TEST PROTECTED ROUTE:
 @router.get('/protected-route', tags=["test"])
-async def protected_route(email : str = fastapi.Depends(AuthHandler.authorization_wrapper)):
+async def protected_route(email : str = fastapi.Depends(authorization_wrapper)):
     return {"data" : "Hello, your email is: " + email}
 
 
