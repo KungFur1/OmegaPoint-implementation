@@ -16,3 +16,6 @@ pydantic[email]
 # Encrypt passwords:
 passlib
 bcrypt
+
+# Database:
+mysql-connector-python
