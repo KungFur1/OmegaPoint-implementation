@@ -6,7 +6,7 @@ class UserSchema(BaseModel):
     email : EmailStr  = Field(default = None)
     password : str = Field(default = None)
     class Config:
-        the_schema = {
+        json_schema_extra = {
             "user_demo" : {
                 "name" : "Bek",
                 "email" : "help@bekbrace.com",
@@ -19,7 +19,7 @@ class UserLoginSchema(BaseModel):
     email : EmailStr  = Field(default = None)
     password : str = Field(default = None)
     class Config:
-        the_schema = {
+        json_schema_extra = {
             "user_demo" : {
                 "email" : "help@bekbrace.com",
                 "password" : "pass"

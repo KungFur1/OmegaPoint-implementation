@@ -5,7 +5,7 @@ class BlogSchema(BaseModel):
     title : str = Field(default=None)
     content : str = Field(default=None)
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "blog_demo" : {
                 "title" : "some title about cars",
                 "content" : "some content about cars"
