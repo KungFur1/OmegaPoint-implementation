@@ -9,6 +9,18 @@ import app.users.helper as helper
 
 router = fastapi.APIRouter()
 
+# TEST PROTECTED ROUTE:
+@router.get('/protected-route', tags=["test"])
+async def protected_route(user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+    return {"data" : "Hello, your email is: " + user_identification.email + " Your ID: " + str(user_identification.id)}
+
+
+# TEST UNPROTECTED ROUTE:
+@router.get('/', tags=["test"])
+async def root():
+    return {"data" : "Hello, this the root URL"}
+
+
 
 
 # REGULAR USER AUTHENTICATION START
@@ -34,19 +46,20 @@ async def user_login(login_data : UserLoginModel = fastapi.Body(default=None)):
 
 # Register a company owner user, done by the system administrators only
 @router.post("/cinematic/company/users/owner/register", tags=["company_users", "register", "owners"], status_code=201)
-async def owner_register(owner_data : UserModel = fastapi.Body(default=None)):
+async def owner_register(owner_data : UserModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+
     return {}
 
 
 # Register a company manager user, done by the company owner user only
 @router.post("/cinematic/company/users/manager/register", tags=["company_users", "register", "owners", "managers"], status_code=201)
-async def manager_register(manager_data : UserModel = fastapi.Body(default=None)):
+async def manager_register(manager_data : UserModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     return {}
 
 
 # Register a company employee user, done by the company manager users and company owner user only
 @router.post("/cinematic/company/users/employee/register", tags=["company_users", "register", "owners", "managers", "employees"], status_code=201)
-async def employee_register(employee_data : UserModel = fastapi.Body(default=None)):
+async def employee_register(employee_data : UserModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     return {}
 
 
@@ -62,25 +75,25 @@ async def company_user_login(login_data : UserLoginModel = fastapi.Body(default=
 
 # Get all company users
 @router.get("/cinematic/company/users", tags=["company_users", "managers", "owners"])
-async def get_all_company_users():
+async def get_all_company_users(user_identification = fastapi.Depends(authorization_wrapper)):
     return {}
 
 
 # Get a specific user from the company 
 @router.get("/cinematic/company/{user_id}", tags=["company_users", "managers", "owners"])
-async def get_user_by_id():
+async def get_user_by_id(user_identification = fastapi.Depends(authorization_wrapper)):
     return {}
 
 
 # Update company employee (EXCEPT Owner/Manager), Owner can update any user
 @router.put("/cinematic/company/{user_id}", tags=["company_users", "managers", "owners"])
-async def update_company_user():
+async def update_company_user(user_identification = fastapi.Depends(authorization_wrapper)):
     return {}
 
 
 # Delete user, that was created by that company (EXCEPT Owner/Manager), Owner can delete any user
 @router.delete("/cinematic/company/{user_id}", tags=["company_users", "managers", "owners"])
-async def delete_company_user():
+async def delete_company_user(user_identification = fastapi.Depends(authorization_wrapper)):
     return {}
 
 
