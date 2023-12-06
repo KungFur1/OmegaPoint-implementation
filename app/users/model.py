@@ -12,7 +12,7 @@ class CompanyPositions(Enum):
 
 class UserModel(BaseModel):
     # Main authentication data (Required in registration)
-    user_id : int  = Field(default=None)
+    id : int  = Field(default=None)
     email : EmailStr  = Field(default = None)
     password : str = Field(default = None)
 
@@ -56,5 +56,20 @@ class UserLoginModel(BaseModel):
             "example": {
                 "email": "user@example.com",
                 "password": "abc"
+            }
+        }
+
+
+class UserAuthenticationDataModel(BaseModel):
+    id : int
+    email : EmailStr
+    password : str
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "user_id": 12345,
+                "email": "user@example.com",
+                "password": "abc",
             }
         }

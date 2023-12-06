@@ -1,5 +1,5 @@
 from app.db_connection import mysql_connection
-from app.users.model import UserModel, UserLoginModel, CompanyPositions
+from app.users.model import UserModel, UserLoginModel, CompanyPositions, UserAuthenticationDataModel
 import mysql.connector
 
 connection = mysql_connection()
@@ -47,14 +47,14 @@ def email_exists(email):
 
 
 # Find user by email
-def retrieve_user_by_email(email):
+def retrieve_user_by_email(email) -> UserAuthenticationDataModel:
     cursor = connection.cursor(dictionary=True)
-    query = "SELECT  email, password_hash AS password FROM users WHERE email = %s"
+    query = "SELECT id, email, password_hash AS password FROM users WHERE email = %s"
     cursor.execute(query, (email,))
     result = cursor.fetchone()
     cursor.close()
     if result:
-        return UserLoginModel(**result)
+        return UserAuthenticationDataModel(**result)
     else:
         return None
 

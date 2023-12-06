@@ -1,7 +1,8 @@
 import fastapi
 from app.JWT_auth.authentication import get_password_hash, verify_password
 from app.JWT_auth.jwt_handler import signJWT
-from app.users.model import UserModel, UserLoginModel, CompanyPositions
+from app.JWT_auth.authorization import UserIdentification
+from app.users.model import UserModel, UserLoginModel, CompanyPositions, UserAuthenticationDataModel
 import app.users.db as db
 
 router = fastapi.APIRouter()
@@ -24,9 +25,9 @@ async def user_register(user_data : UserModel = fastapi.Body(default=None)):
 # Login for regular users
 @router.post("/cinematic/users/login", tags=["regular_users", "login"], status_code=201)
 async def user_login(login_data : UserLoginModel = fastapi.Body(default=None)):
-    x : UserLoginModel = db.retrieve_user_by_email(login_data.email)
+    x : UserAuthenticationDataModel = db.retrieve_user_by_email(login_data.email)
     if x and verify_password(login_data.password, x.password):
-        return signJWT(login_data.email)
+        return {"token" : signJWT(UserIdentification(id=x.id, email=x.email))}
     else:
         raise fastapi.HTTPException(status_code=400, detail="bad password and/or email")
 
@@ -36,32 +37,32 @@ async def user_login(login_data : UserLoginModel = fastapi.Body(default=None)):
 
 
 
-# AUTHENTICATION START
+# COMPANY USER AUTHENTICATION START
 
 # Register a company owner user, done by the system administrators only
-@router.post("/cinematic/company/users/owner/register", tags=["company_users", "register", "owners"])
+@router.post("/cinematic/company/users/owner/register", tags=["company_users", "register", "owners"], status_code=201)
 async def owner_register(owner_data : UserModel = fastapi.Body(default=None)):
     return {}
 
 
 # Register a company manager user, done by the company owner user only
-@router.post("/cinematic/company/users/manager/register", tags=["company_users", "register", "owners", "managers"])
+@router.post("/cinematic/company/users/manager/register", tags=["company_users", "register", "owners", "managers"], status_code=201)
 async def manager_register(manager_data : UserModel = fastapi.Body(default=None)):
     return {}
 
 
 # Register a company employee user, done by the company manager users and company owner user only
-@router.post("/cinematic/company/users/employee/register", tags=["company_users", "register", "owners", "managers", "employees"])
+@router.post("/cinematic/company/users/employee/register", tags=["company_users", "register", "owners", "managers", "employees"], status_code=201)
 async def employee_register(employee_data : UserModel = fastapi.Body(default=None)):
     return {}
 
 
 # Login for users that belong to some company
-@router.post("/cinematic/company/users/login", tags=["company_users", "login", "owners", "managers", "employees"])
-async def company_user_login(login_data : UserLoginModel = fastapi.Body(default=None)):
+@router.post("/cinematic/company/users/login", tags=["company_users", "login", "owners", "managers", "employees"], status_code=201)
+async def company_user_login(login_data : UserLoginModel = fastapi.Body(default=None), status_code=201):
     return {}
 
-# AUTHENTICATION END
+# COMPANY USER AUTHENTICATION END
 
 
 # ENDPOINTS FOR COMPANY MANAGERS/OWNERS FOR MANAGING COMPANY USERS

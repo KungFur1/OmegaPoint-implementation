@@ -3,10 +3,11 @@ from fastapi import Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from app.JWT_auth.jwt_handler import decodeJWT
 import jwt
+from app.JWT_auth.user_identification import UserIdentification
 
 _security = HTTPBearer()
 
 
 # Use this function in any endpoint to get access to authorized user information
-def authorization_wrapper(auth : HTTPAuthorizationCredentials = Security(_security)):
+def authorization_wrapper(auth : HTTPAuthorizationCredentials = Security(_security)) -> UserIdentification:
     return decodeJWT(auth.credentials)
