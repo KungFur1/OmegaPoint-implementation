@@ -1,9 +1,10 @@
 CREATE DATABASE IF NOT EXISTS OmegaPoint;
-
 USE OmegaPoint;
 
+
+-- User data
 CREATE TABLE IF NOT EXISTS users (
-    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- Does not work for some reason
@@ -12,3 +13,21 @@ CREATE TABLE IF NOT EXISTS users (
     last_name VARCHAR(50) DEFAULT NULL,
     address TEXT DEFAULT NULL
 );
+
+CREATE TABLE IF NOT EXISTS admins (
+    user_id INT PRIMARY KEY,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+
+
+-- Company data
+CREATE TABLE IF NOT EXISTS company (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    `name` VARCHAR(50) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
