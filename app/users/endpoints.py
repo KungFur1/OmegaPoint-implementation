@@ -1,11 +1,14 @@
 import fastapi
 from app.JWT_auth.authentication import get_password_hash, verify_password
 from app.JWT_auth.jwt_handler import signJWT
-from app.JWT_auth.authorization import UserIdentification
+from app.JWT_auth.user_identification import UserIdentification
+from app.JWT_auth.authorization import authorization_wrapper
 from app.users.model import UserModel, UserLoginModel, CompanyPositions, UserAuthenticationDataModel
 import app.users.db as db
+import app.users.helper as helper
 
 router = fastapi.APIRouter()
+
 
 
 # REGULAR USER AUTHENTICATION START
@@ -13,23 +16,13 @@ router = fastapi.APIRouter()
 # Register a regular user
 @router.post("/cinematic/users/register", tags=["regular_users", "register"], status_code=201)
 async def user_register(user_data : UserModel = fastapi.Body(default=None)):
-    if db.email_exists(email=user_data.email):
-        raise fastapi.HTTPException(status_code=400, detail="user with such email already exists")
-    user_data.password = get_password_hash(user_data.password)
-    if db.insert_user_to_database(user_data):
-        return {"info" : "registration succesful"}
-    else:
-        raise fastapi.HTTPException(status_code=500, detail="failed to upload registration data to database")
+    return helper.register(user_data)
 
 
 # Login for regular users
 @router.post("/cinematic/users/login", tags=["regular_users", "login"], status_code=201)
 async def user_login(login_data : UserLoginModel = fastapi.Body(default=None)):
-    x : UserAuthenticationDataModel = db.retrieve_user_by_email(login_data.email)
-    if x and verify_password(login_data.password, x.password):
-        return {"token" : signJWT(UserIdentification(id=x.id, email=x.email))}
-    else:
-        raise fastapi.HTTPException(status_code=400, detail="bad password and/or email")
+    return helper.login(login_data)
 
 # REGULAR USER AUTHENTICATION END
 

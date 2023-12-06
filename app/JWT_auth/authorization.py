@@ -2,7 +2,6 @@
 from fastapi import Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from app.JWT_auth.jwt_handler import decodeJWT
-import jwt
 from app.JWT_auth.user_identification import UserIdentification
 
 _security = HTTPBearer()
