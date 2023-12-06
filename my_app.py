@@ -37,10 +37,9 @@ import fastapi
 
 from app.tests.endpoints import router as tests_router
 from app.users.endpoints import router as users_router
-from app.blogs.endpoints import router as blogs_router
+
 
 app = fastapi.FastAPI()
 
 app.include_router(tests_router)
 app.include_router(users_router)
-app.include_router(blogs_router)
