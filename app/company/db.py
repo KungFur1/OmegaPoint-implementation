@@ -2,6 +2,7 @@
 from app.db_connection import mysql_connection
 import mysql.connector
 from app.company.model import CompanyModel
+from typing import List
 
 connection = mysql_connection()
 
@@ -15,7 +16,7 @@ def post_company(company: CompanyModel):
     cursor.close()
 
 
-def get_all_companies() -> [CompanyModel] | []:
+def get_all_companies() -> List[CompanyModel]:
     query = "SELECT id, email, name, created_at FROM company"
     cursor = connection.cursor()
     cursor.execute(query)
