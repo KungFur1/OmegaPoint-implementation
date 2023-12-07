@@ -1,6 +1,7 @@
 from app.db_connection import mysql_connection
-from app.users.model import UserModel, UserLoginModel, CompanyPositions, UserAuthenticationDataModel
 import mysql.connector
+from app.users.model import UserModel, UserLoginModel, CompanyPositions, UserAuthenticationDataModel
+
 
 connection = mysql_connection()
 # All database post, put, delete functions will return true if operation was succesful, false if not
