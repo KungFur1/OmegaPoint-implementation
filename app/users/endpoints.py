@@ -3,10 +3,10 @@
 # raise fastapi.HTTPException - when something is wrong, provide detail
 # all messages should start with non-capital letter and end without a dot
 import fastapi
+from app.JWT_auth.user_identification import UserIdentification # Authorization!
+from app.JWT_auth.authorization import authorization_wrapper # Authorization!
 from app.JWT_auth.authentication import get_password_hash, verify_password
 from app.JWT_auth.jwt_handler import signJWT
-from app.JWT_auth.user_identification import UserIdentification
-from app.JWT_auth.authorization import authorization_wrapper
 from app.users.model import UserModel, UserLoginModel, CompanyPositions, UserAuthenticationDataModel
 import app.users.db as db
 import app.users.helper as helper
@@ -68,7 +68,7 @@ async def employee_register(employee_data : UserModel = fastapi.Body(default=Non
     return {}
 
 
-# Login for users that belong to some company
+# Login for users that belong to some company (The same as regular user login)
 @router.post("/cinematic/company/users/login", tags=["company_users", "login", "owners", "managers", "employees"], status_code=201)
 async def company_user_login(login_data : UserLoginModel = fastapi.Body(default=None), status_code=201):
     return {}
