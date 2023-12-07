@@ -3,25 +3,8 @@
 from app.db_connection import mysql_connection
 import mysql.connector
 from app.company.model import CompanyModel
-from app.users.model import AdminInformationModel
 
 connection = mysql_connection()
-
-
-def get_admin_information(user_id) -> AdminInformationModel:
-    try:
-        query = "SELECT user_id, created_at FROM admins WHERE user_id = %s"
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute(query, (user_id,))
-        result = cursor.fetchone()
-        if result:
-            return AdminInformationModel(**result)
-        else:
-            return None
-    except mysql.connector.Error as e:
-        return None
-    finally:
-        cursor.close()
 
 
 def post_company(company: CompanyModel) -> bool:

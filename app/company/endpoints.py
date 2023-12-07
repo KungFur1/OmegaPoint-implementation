@@ -10,6 +10,7 @@ from app.JWT_auth.user_identification import UserIdentification
 from app.JWT_auth.authorization import authorization_wrapper
 # Authorization!
 import app.company.db as db
+import app.users.db as users_db
 
 router = fastapi.APIRouter()
 
@@ -31,7 +32,7 @@ async def get_company_by_id(company_id : int):
 
 @router.post("/cinematic/company", tags=["company"], status_code=201)
 async def create_company(company_data : CompanyModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
-    if db.get_admin_information(user_id=user_identification.id):
+    if users_db.get_admin_information(user_id=user_identification.id):
         if db.post_company(company_data):
             return {"info" : "company succesfully inserted"}
         else:

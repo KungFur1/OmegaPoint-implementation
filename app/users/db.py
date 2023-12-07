@@ -2,7 +2,7 @@
 # GET operation returns: the object if succesful, None if not successful
 from app.db_connection import mysql_connection
 import mysql.connector
-from app.users.model import UserModel, UserLoginModel, CompanyPositions, UserAuthenticationDataModel
+from app.users.model import UserModel, UserLoginModel, CompanyPositions, UserAuthenticationDataModel, AdminInformationModel
 
 connection = mysql_connection()
 
@@ -32,6 +32,22 @@ def get_user_by_email(email) -> UserAuthenticationDataModel | None:
         result = cursor.fetchone()
         if result:
             return UserAuthenticationDataModel(**result)
+        else:
+            return None
+    except mysql.connector.Error as e:
+        return None
+    finally:
+        cursor.close()
+
+
+def get_admin_information(user_id) -> AdminInformationModel:
+    try:
+        query = "SELECT user_id, created_at FROM admins WHERE user_id = %s"
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute(query, (user_id,))
+        result = cursor.fetchone()
+        if result:
+            return AdminInformationModel(**result)
         else:
             return None
     except mysql.connector.Error as e:
