@@ -73,3 +73,16 @@ class UserAuthenticationDataModel(BaseModel):
                 "password": "abc",
             }
         }
+
+
+class AdminInformationModel(BaseModel):
+    user_id: int
+    created_at: datetime
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": 2,
+                "created_at": "2023-12-05T00:00:00"
+            }
+        }

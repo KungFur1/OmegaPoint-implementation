@@ -1,3 +1,8 @@
+# {"data" : data} - when returning some data
+# {"info" : success_message} - when some operation was successful
+# raise fastapi.HTTPException - when something is wrong, provide detail
+# all messages should start with non-capital letter and end without a dot
+# {"token" : token} - after succesful login
 import fastapi
 from app.company.model import CompanyModel
 # Authorization!
@@ -11,11 +16,11 @@ router = fastapi.APIRouter()
 
 @router.get("/cinematic/company", tags=["company"])
 async def get_all_companies():
-    all_companies = db.retrieve_all_companies()
+    all_companies = db.get_all_companies()
     if all_companies:
         return {"data" : all_companies}
     else:
-        raise fastapi.HTTPException(status_code=500, detail="Failed to retrieve companies from database")
+        raise fastapi.HTTPException(status_code=500, detail="failed to retrieve companies from database")
 
 
 @router.get("/cinematic/company/{company_id}", tags=["company"])
@@ -26,13 +31,13 @@ async def get_company_by_id(company_id : int):
 
 @router.post("/cinematic/company", tags=["company"], status_code=201)
 async def create_company(company_data : CompanyModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
-    if db.user_is_admin(user_id=user_identification.id):
-        if db.insert_company(company_data):
+    if db.get_admin_information(user_id=user_identification.id):
+        if db.post_company(company_data):
             return {"info" : "company succesfully inserted"}
         else:
-            raise fastapi.HTTPException(status_code=500, detail="Failed to insert company into database")
+            raise fastapi.HTTPException(status_code=500, detail="failed to insert company into database")
     else:
-        raise fastapi.HTTPException(status_code=400, detail="Only an admin user can create a company")
+        raise fastapi.HTTPException(status_code=400, detail="only an admin user can create a company")
 
 
 @router.delete("/cinematic/company", tags=["company"])

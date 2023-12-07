@@ -1,3 +1,7 @@
+# {"data" : data} - when returning some data
+# {"info" : success_message} - when some operation was successful
+# raise fastapi.HTTPException - when something is wrong, provide detail
+# all messages should start with non-capital letter and end without a dot
 import fastapi
 from app.JWT_auth.authentication import get_password_hash, verify_password
 from app.JWT_auth.jwt_handler import signJWT
@@ -8,6 +12,7 @@ import app.users.db as db
 import app.users.helper as helper
 
 router = fastapi.APIRouter()
+
 
 # TEST PROTECTED ROUTE:
 @router.get('/protected-route', tags=["test"])

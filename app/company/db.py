@@ -1,29 +1,33 @@
+# POST PUT DELETE operations return: true if successful, false if not successful
+# GET operation returns: the object if succesful, None if not successful
 from app.db_connection import mysql_connection
 import mysql.connector
 from app.company.model import CompanyModel
+from app.users.model import AdminInformationModel
 
 connection = mysql_connection()
-# All database post, put, delete functions will return true if operation was succesful, false if not
 
 
-def user_is_admin(user_id) -> bool:
+def get_admin_information(user_id) -> AdminInformationModel:
     try:
-        query = "SELECT * FROM admins WHERE user_id = %s"
-        cursor = connection.cursor()
+        query = "SELECT user_id, created_at FROM admins WHERE user_id = %s"
+        cursor = connection.cursor(dictionary=True)
         cursor.execute(query, (user_id,))
         result = cursor.fetchone()
-        return result is not None
+        if result:
+            return AdminInformationModel(**result)
+        else:
+            return None
     except mysql.connector.Error as e:
-        return False
+        return None
     finally:
-        if connection.is_connected():
-            cursor.close()
+        cursor.close()
 
 
-def insert_company(company: CompanyModel) -> bool:
+def post_company(company: CompanyModel) -> bool:
     try:
-        query = "INSERT INTO company (id, email, name) VALUES (%s, %s, %s)"
-        values = (company.id, company.email, company.name)
+        query = "INSERT INTO company (email, name) VALUES (%s, %s)"
+        values = (company.email, company.name)
         cursor = connection.cursor()
         cursor.execute(query, values)
         connection.commit()
@@ -31,11 +35,10 @@ def insert_company(company: CompanyModel) -> bool:
     except mysql.connector.Error as e:
         return False
     finally:
-        if connection.is_connected():
-            cursor.close()
+        cursor.close()
 
 
-def retrieve_all_companies():
+def get_all_companies():
     try:
         query = "SELECT id, email, name, created_at FROM company"
         cursor = connection.cursor()
@@ -49,5 +52,4 @@ def retrieve_all_companies():
     except mysql.connector.Error as e:
         return None
     finally:
-        if connection.is_connected():
-            cursor.close()
+        cursor.close()

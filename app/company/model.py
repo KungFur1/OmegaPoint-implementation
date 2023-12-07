@@ -13,6 +13,7 @@ class CompanyModel(BaseModel):
             "example": {
                 "id": 57,
                 "email": "user@example.com",
-                "name": "UAB gpt technologies"
+                "name": "UAB gpt technologies",
+                "created_at": "2023-12-05T00:00:00"
             }
         }
