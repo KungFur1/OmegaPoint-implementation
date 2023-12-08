@@ -9,6 +9,8 @@ from app.JWT_auth.authentication import get_password_hash, verify_password
 from app.JWT_auth.jwt_handler import signJWT
 from app.users.model import UserModel, UserLoginModel, CompanyPositions, UserAuthenticationDataModel
 import app.users.db as db
+import app.company.db as company_db
+from mysql.connector import Error as DBError
 import app.users.helper as helper
 
 router = fastapi.APIRouter()
@@ -52,8 +54,18 @@ async def user_login(login_data : UserLoginModel = fastapi.Body(default=None)):
 # Register a company owner user, done by the system administrators only
 @router.post("/cinematic/company/users/owner/register", tags=["company_users", "register", "owners"], status_code=201)
 async def owner_register(owner_data : UserModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
-
-    return {}
+    try:
+        if db.get_admin_information(user_id=user_identification.id):
+            owner_data.position = CompanyPositions.OWNER
+            if company_db.get_company_by_id(owner_data.company_id):
+                db.post_company_user(owner_data)
+                return {"info" : "owner user succesfully registered"}
+            else:
+                raise fastapi.HTTPException(status_code=400, detail="company with provided id does not exist")
+        else:
+            raise fastapi.HTTPException(status_code=400, detail="you must be admin user to register owner")
+    except DBError as e:
+        raise fastapi.HTTPException(status_code=500, detail="database error")
 
 
 # Register a company manager user, done by the company owner user only
