@@ -14,7 +14,7 @@ from mysql.connector import Error as DBError
 router = fastapi.APIRouter()
 
 
-@router.get("/cinematic/company", tags=["company"])
+@router.get("/cinematic/company", tags=["company"], status_code=200)
 async def get_all_companies():
     try:
         return {"data" : db.get_all_companies()}
@@ -22,7 +22,7 @@ async def get_all_companies():
         raise fastapi.HTTPException(status_code=500, detail="database error")
 
 
-@router.get("/cinematic/company/{company_id}", tags=["company"])
+@router.get("/cinematic/company/{company_id}", tags=["company"], status_code=200)
 async def get_company_by_id(company_id : int):
     # Not implemented yet
     return {}
@@ -31,7 +31,7 @@ async def get_company_by_id(company_id : int):
 @router.post("/cinematic/company", tags=["company"], status_code=201)
 async def create_company(company_data : CompanyModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     try:
-        if users_db.get_admin_information(user_id=user_identification.id):
+        if users_db.get_admin_information_by_id(user_id=user_identification.id):
             db.post_company(company_data)
             return {"info" : "company succesfully inserted"}
         else:
@@ -40,7 +40,13 @@ async def create_company(company_data : CompanyModel = fastapi.Body(default=None
         raise fastapi.HTTPException(status_code=500, detail="database error")
 
 
-@router.delete("/cinematic/company", tags=["company"])
+@router.post("/cinematic/company", tags=["company"], status_code=201)
+async def edit_company(company_data : CompanyModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+    # Not implemented yet
+    return {}
+
+
+@router.delete("/cinematic/company", tags=["company"], status_code=204)
 async def delete_company(user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     # Not implemented yet
     return {}

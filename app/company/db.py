@@ -2,7 +2,7 @@
 from app.db_connection import mysql_connection
 import mysql.connector
 from app.company.model import CompanyModel
-from typing import List
+from typing import List, Optional
 
 connection = mysql_connection()
 
@@ -29,7 +29,7 @@ def get_all_companies() -> List[CompanyModel]:
     return companies
 
 
-def get_company_by_id(id: int) -> CompanyModel | None:
+def get_company_by_id(id: int) -> Optional[CompanyModel]:
     query = "SELECT id, email, `name`, created_at FROM company WHERE id = %s"
     cursor = connection.cursor()
     cursor.execute(query, (id,))

@@ -25,14 +25,14 @@ async def get_role_by_id(user_identification : UserIdentification = fastapi.Depe
 
 
 @router.post("/cinematic/company/roles", tags=["users", "roles"], status_code=201)
-async def post_role(role_data : RoleModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+async def upload_role(role_data : RoleModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     # Check if user is owner or manager
     # Post role to database
     return {}
 
 
 @router.put("/cinematic/company/roles/{role_id}", tags=["users", "roles"], status_code=200)
-async def post_role(role_data : RoleModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+async def update_role(role_data : RoleModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     # Retrieve the role`s company_id
     # Check if user is owner or manager, check if user belongs to that company.
     # If user is, update the role in database
@@ -40,7 +40,7 @@ async def post_role(role_data : RoleModel = fastapi.Body(default=None), user_ide
 
 
 @router.delete("/cinematic/company/roles/{role_id}", tags=["users", "roles"], status_code=204)
-async def post_role(user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+async def delete_role(user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     # Retrieve the role`s company_id
     # Check if user is owner or manager, check if user belongs to that company.
     # If user is, delete the role

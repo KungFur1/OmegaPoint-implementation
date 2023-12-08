@@ -15,27 +15,13 @@ from mysql.connector import Error as DBError
 router = fastapi.APIRouter()
 
 
-# TEST PROTECTED ROUTE:
-@router.get('/protected-route', tags=["test"])
-async def protected_route(user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
-    return {"data" : "Hello, your email is: " + user_identification.email + " Your ID: " + str(user_identification.id)}
-
-
-# TEST UNPROTECTED ROUTE:
-@router.get('/', tags=["test"])
-async def root():
-    return {"data" : "Hello, this the root URL"}
-
-
-
-
-# REGULAR USER AUTHENTICATION START
+# AUTHENTICATION START
 
 # Register a regular user
 @router.post("/cinematic/users/register", tags=["regular_users", "register"], status_code=201)
 async def user_register(user_data : UserModel = fastapi.Body(default=None)):
     try:
-        if db.get_user_by_email(email=user_data.email):
+        if db.get_user_authentication_data_by_email(email=user_data.email):
             raise fastapi.HTTPException(status_code=400, detail="user with such email already exists")
         user_data.password = get_password_hash(user_data.password)
         db.post_user(user_data)
@@ -44,11 +30,11 @@ async def user_register(user_data : UserModel = fastapi.Body(default=None)):
         raise fastapi.HTTPException(status_code=500, detail="database error")
 
 
-# Login for regular users
+# Login for all users
 @router.post("/cinematic/users/login", tags=["regular_users", "login"], status_code=201)
 async def user_login(login_data : UserLoginModel = fastapi.Body(default=None)):
     try:
-        x : UserAuthenticationDataModel = db.get_user_by_email(login_data.email)
+        x : UserAuthenticationDataModel = db.get_user_authentication_data_by_email(login_data.email)
         if x and verify_password(login_data.password, x.password):
             return {"token" : signJWT(UserIdentification(id=x.id, email=x.email))}
         else:
@@ -56,19 +42,12 @@ async def user_login(login_data : UserLoginModel = fastapi.Body(default=None)):
     except DBError:
         raise fastapi.HTTPException(status_code=500, detail="database error")
 
-# REGULAR USER AUTHENTICATION END
-
-
-
-
-
-# COMPANY USER AUTHENTICATION START
 
 # Register a company owner user, done by the system administrators only
 @router.post("/cinematic/company/users/owner/register", tags=["company_users", "register", "owners"], status_code=201)
 async def owner_register(owner_data : UserModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     try:
-        if db.get_admin_information(user_id=user_identification.id):
+        if db.get_admin_information_by_id(user_id=user_identification.id):
             owner_data.position = CompanyPositions.OWNER
             if company_db.get_company_by_id(owner_data.company_id):
                 db.post_company_user(owner_data)
@@ -93,42 +72,32 @@ async def employee_register(employee_data : UserModel = fastapi.Body(default=Non
     return {}
 
 
-# Login for users that belong to some company (The same as regular user login)
-@router.post("/cinematic/company/users/login", tags=["company_users", "login", "owners", "managers", "employees"], status_code=201)
-async def company_user_login(login_data : UserLoginModel = fastapi.Body(default=None), status_code=201):
-    return {}
+# AUTHENTICATION END
 
-# COMPANY USER AUTHENTICATION END
 
 
 # ENDPOINTS FOR COMPANY MANAGERS/OWNERS FOR MANAGING COMPANY USERS
 
 # Get all company users
-@router.get("/cinematic/company/users", tags=["company_users", "managers", "owners"])
+@router.get("/cinematic/company/users", tags=["company_users", "managers", "owners"], status_code=200)
 async def get_all_company_users(user_identification = fastapi.Depends(authorization_wrapper)):
     return {}
 
 
 # Get a specific user from the company 
-@router.get("/cinematic/company/{user_id}", tags=["company_users", "managers", "owners"])
+@router.get("/cinematic/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=200)
 async def get_user_by_id(user_identification = fastapi.Depends(authorization_wrapper)):
     return {}
 
 
 # Update company employee (EXCEPT Owner/Manager), Owner can update any user
-@router.put("/cinematic/company/{user_id}", tags=["company_users", "managers", "owners"])
-async def update_company_user(user_identification = fastapi.Depends(authorization_wrapper)):
+@router.put("/cinematic/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=200)
+async def update_company_user(employee_data : UserModel = fastapi.Body(default=None), user_identification = fastapi.Depends(authorization_wrapper)):
     return {}
 
 
 # Delete user, that was created by that company (EXCEPT Owner/Manager), Owner can delete any user
-@router.delete("/cinematic/company/{user_id}", tags=["company_users", "managers", "owners"])
+@router.delete("/cinematic/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=204)
 async def delete_company_user(user_identification = fastapi.Depends(authorization_wrapper)):
     return {}
-
-
-# ROLE MANAGMENT ENDPOINTS (MAYBE THIS SHOULD BE ANOTHER COMPONENT OR FOLDER?)
-
-
-# LOYALTY MANAGMENT ENDPOINTS ???
 

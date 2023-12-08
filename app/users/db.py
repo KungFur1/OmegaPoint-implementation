@@ -18,7 +18,7 @@ def post_user(user_data: UserModel):
     cursor.close()
 
 
-def get_user_by_email(email : str) -> UserAuthenticationDataModel | None:
+def get_user_authentication_data_by_email(email : str) -> UserAuthenticationDataModel | None:
     query = "SELECT id, email, password_hash AS password FROM users WHERE email = %s"
     cursor = connection.cursor(dictionary=True)
     cursor.execute(query, (email,))
@@ -30,7 +30,7 @@ def get_user_by_email(email : str) -> UserAuthenticationDataModel | None:
         return None
 
 
-def get_admin_information(user_id: int) -> AdminInformationModel | None:
+def get_admin_information_by_id(user_id: int) -> AdminInformationModel | None:
     query = "SELECT user_id, created_at FROM admins WHERE user_id = %s"
     cursor = connection.cursor(dictionary=True)
     cursor.execute(query, (user_id,))
@@ -42,7 +42,7 @@ def get_admin_information(user_id: int) -> AdminInformationModel | None:
         return None
 
 
-# When inserting company user, multiple datase operations happen, 
+# When inserting company user, multiple database operations happen, 
 # there MUST NOT be a situation where one operation is succesful and other is not - we use transaction to fix that.
 def post_company_user(user_data: UserModel):
     cursor = connection.cursor()

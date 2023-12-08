@@ -86,3 +86,18 @@ class AdminInformationModel(BaseModel):
                 "created_at": "2023-12-05T00:00:00"
             }
         }
+
+
+class UserCompanyDataModel(BaseModel):
+    user_id : int
+    company_id : int
+    position : CompanyPositions
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "user_id": 931,
+                "company_id": 16,
+                "position": 2,
+            }
+        }
