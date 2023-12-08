@@ -11,7 +11,6 @@ from app.users.model import UserModel, UserLoginModel, CompanyPositions, UserAut
 import app.users.db as db
 import app.company.db as company_db
 from mysql.connector import Error as DBError
-import app.users.helper as helper
 
 router = fastapi.APIRouter()
 
@@ -35,13 +34,27 @@ async def root():
 # Register a regular user
 @router.post("/cinematic/users/register", tags=["regular_users", "register"], status_code=201)
 async def user_register(user_data : UserModel = fastapi.Body(default=None)):
-    return helper.register(user_data)
+    try:
+        if db.get_user_by_email(email=user_data.email):
+            raise fastapi.HTTPException(status_code=400, detail="user with such email already exists")
+        user_data.password = get_password_hash(user_data.password)
+        db.post_user(user_data)
+        return {"info" : "registration succesful"}
+    except DBError as e:
+        raise fastapi.HTTPException(status_code=500, detail="database error")
 
 
 # Login for regular users
 @router.post("/cinematic/users/login", tags=["regular_users", "login"], status_code=201)
 async def user_login(login_data : UserLoginModel = fastapi.Body(default=None)):
-    return helper.login(login_data)
+    try:
+        x : UserAuthenticationDataModel = db.get_user_by_email(login_data.email)
+        if x and verify_password(login_data.password, x.password):
+            return {"token" : signJWT(UserIdentification(id=x.id, email=x.email))}
+        else:
+            raise fastapi.HTTPException(status_code=400, detail="bad password and/or email")
+    except DBError:
+        raise fastapi.HTTPException(status_code=500, detail="database error")
 
 # REGULAR USER AUTHENTICATION END
 
