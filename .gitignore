@@ -60,7 +60,7 @@ ipython_config.py
 __pypackages__/
 
 # Environment
-.env
+#.env #For development
 .venv
 env/
 venv/
