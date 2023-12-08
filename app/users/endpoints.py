@@ -2,15 +2,15 @@
 # {"info" : success_message} - when some operation was successful
 # raise fastapi.HTTPException - when something is wrong, provide detail
 # all messages should start with non-capital letter and end without a dot
+# {"token" : token} - when user logs in
 import fastapi
 from app.JWT_auth.user_identification import UserIdentification # Authorization!
 from app.JWT_auth.authorization import authorization_wrapper # Authorization!
-from app.JWT_auth.authentication import get_password_hash, verify_password
-from app.JWT_auth.jwt_handler import signJWT
 from app.users.model import UserModel, UserLoginModel, CompanyPositions, UserAuthenticationDataModel
 import app.users.db as db
 import app.company.db as company_db
 from mysql.connector import Error as DBError
+import app.users.logreg as logreg
 
 router = fastapi.APIRouter()
 
@@ -20,27 +20,16 @@ router = fastapi.APIRouter()
 # Register a regular user
 @router.post("/cinematic/users/register", tags=["regular_users", "register"], status_code=201)
 async def user_register(user_data : UserModel = fastapi.Body(default=None)):
-    try:
-        if db.get_user_authentication_data_by_email(email=user_data.email):
-            raise fastapi.HTTPException(status_code=400, detail="user with such email already exists")
-        user_data.password = get_password_hash(user_data.password)
-        db.post_user(user_data)
-        return {"info" : "registration succesful"}
-    except DBError as e:
-        raise fastapi.HTTPException(status_code=500, detail="database error")
+    user_data.company_id = None
+    user_data.position = None
+    user_data.roles = None
+    return logreg.register(user_data)
 
 
 # Login for all users
 @router.post("/cinematic/users/login", tags=["regular_users", "login"], status_code=201)
 async def user_login(login_data : UserLoginModel = fastapi.Body(default=None)):
-    try:
-        x : UserAuthenticationDataModel = db.get_user_authentication_data_by_email(login_data.email)
-        if x and verify_password(login_data.password, x.password):
-            return {"token" : signJWT(UserIdentification(id=x.id, email=x.email))}
-        else:
-            raise fastapi.HTTPException(status_code=400, detail="bad password and/or email")
-    except DBError:
-        raise fastapi.HTTPException(status_code=500, detail="database error")
+    return logreg.login(login_data)
 
 
 # Register a company owner user, done by the system administrators only
@@ -48,10 +37,11 @@ async def user_login(login_data : UserLoginModel = fastapi.Body(default=None)):
 async def owner_register(owner_data : UserModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     try:
         if db.get_admin_information_by_id(user_id=user_identification.id):
-            owner_data.position = CompanyPositions.OWNER
             if company_db.get_company_by_id(owner_data.company_id):
-                db.post_company_user(owner_data)
-                return {"info" : "owner user succesfully registered"}
+                owner_data.company_id = owner_data.company_id
+                owner_data.position = CompanyPositions.OWNER
+                owner_data.roles = None
+                return logreg.register(owner_data)
             else:
                 raise fastapi.HTTPException(status_code=400, detail="company with provided id does not exist")
         else:
@@ -60,16 +50,36 @@ async def owner_register(owner_data : UserModel = fastapi.Body(default=None), us
         raise fastapi.HTTPException(status_code=500, detail="database error")
 
 
-# Register a company manager user, done by the company owner user only
+# Register a company manager user, done by the company owner users only
 @router.post("/cinematic/company/users/manager/register", tags=["company_users", "register", "owners", "managers"], status_code=201)
 async def manager_register(manager_data : UserModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
-    return {}
+    try:
+        company_data = db.get_user_company_data(user_id=user_identification.id)
+        if company_data and company_data.position == CompanyPositions.OWNER:
+            manager_data.company_id = company_data.company_id
+            manager_data.position = CompanyPositions.MANAGER
+            manager_data.roles = None
+            return logreg.register(manager_data)
+        else:
+            raise fastapi.HTTPException(status_code=400, detail="you must be owner user to register manager user")
+    except DBError:
+        raise fastapi.HTTPException(status_code=500, detail="database error")
 
 
-# Register a company employee user, done by the company manager users and company owner user only
+# Register a company employee user, done by the company manager users and company owner users only
 @router.post("/cinematic/company/users/employee/register", tags=["company_users", "register", "owners", "managers", "employees"], status_code=201)
 async def employee_register(employee_data : UserModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
-    return {}
+    try:
+        company_data = db.get_user_company_data(user_id=user_identification.id)
+        if company_data and (company_data.position == CompanyPositions.OWNER or company_data.position == CompanyPositions.MANAGER):
+            employee_data.company_id = company_data.company_id
+            employee_data.position = CompanyPositions.EMPLOYEE
+            employee_data.roles = None
+            return logreg.register(employee_data)
+        else:
+            raise fastapi.HTTPException(status_code=400, detail="you must be owner user to register manager user")
+    except DBError:
+        raise fastapi.HTTPException(status_code=500, detail="database error")
 
 
 # AUTHENTICATION END

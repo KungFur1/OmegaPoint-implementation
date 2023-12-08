@@ -1,7 +1,7 @@
 # All db functions might raise mysql.connector.Error
 from app.db_connection import mysql_connection
 import mysql.connector
-from app.users.model import UserModel, UserLoginModel, CompanyPositions, UserAuthenticationDataModel, AdminInformationModel
+from app.users.model import UserModel, UserLoginModel, CompanyPositions, UserAuthenticationDataModel, AdminInformationModel, UserCompanyDataModel
 
 connection = mysql_connection()
 
@@ -38,6 +38,18 @@ def get_admin_information_by_id(user_id: int) -> AdminInformationModel | None:
     cursor.close()
     if result:
         return AdminInformationModel(**result)
+    else:
+        return None
+
+
+def get_user_company_data(user_id: int) -> UserCompanyDataModel:
+    query = "SELECT user_id, company_id, position FROM company_users_data WHERE user_id = %s"
+    cursor = connection.cursor()
+    cursor.execute(query, (user_id,))
+    result = cursor.fetchone()
+    if result:
+        position_enum = CompanyPositions(result[2])
+        return UserCompanyDataModel(user_id=result[0], company_id=result[1], position=position_enum)
     else:
         return None
 

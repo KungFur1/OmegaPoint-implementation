@@ -17,9 +17,9 @@ class UserModel(BaseModel):
     password : str = Field(default = None)
 
     # Company functionality data
+    company_id : int = Field(default = None)
     position : CompanyPositions = Field(default=CompanyPositions.EMPLOYEE)
     roles : List[int] = Field(default = None)
-    company_id : int = Field(default = None)
 
     # Extra user information
     created_at : datetime = Field(default=None)
