@@ -96,18 +96,18 @@ async def get_all_company_users(user_identification = fastapi.Depends(authorizat
 
 # Get a specific user from the company 
 @router.get("/cinematic/users/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=200)
-async def get_user_by_id(user_identification = fastapi.Depends(authorization_wrapper)):
+async def get_user_by_id(user_id: int, user_identification = fastapi.Depends(authorization_wrapper)):
     return {}
 
 
 # Update company employee (EXCEPT Owner/Manager), Owner can update any user
 @router.put("/cinematic/users/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=200)
-async def update_company_user(employee_data : UserModel = fastapi.Body(default=None), user_identification = fastapi.Depends(authorization_wrapper)):
+async def update_company_user(user_id: int, employee_data : UserModel = fastapi.Body(default=None), user_identification = fastapi.Depends(authorization_wrapper)):
     return {}
 
 
 # Delete user, that was created by that company (EXCEPT Owner/Manager), Owner can delete any user
 @router.delete("/cinematic/users/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=204)
-async def delete_company_user(user_identification = fastapi.Depends(authorization_wrapper)):
+async def delete_company_user(user_id: int, user_identification = fastapi.Depends(authorization_wrapper)):
     return {}
 
