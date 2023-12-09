@@ -9,7 +9,7 @@ def post_role(role: RoleModel):
     query = """
     INSERT INTO roles (company_id, name, description, users_read, users_manage, inventory_read, inventory_manage, 
                        services_read, services_manage, items_read, items_manage, payments_read, payments_manage, 
-                       created_at, created_by)
+                       created_at, created_by_id)
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     data = (
@@ -78,17 +78,43 @@ def get_role_by_id(role_id: int) -> Optional[RoleModel]:
 
 
 def put_role(role: RoleModel):
-    query = """
-    UPDATE roles SET company_id = %s, created_by_id = %s, name = %s, description = %s, created_at = %s, 
-    users_read = %s, users_manage = %s, inventory_read = %s, inventory_manage = %s, services_read = %s, 
-    services_manage = %s, items_read = %s, items_manage = %s, payments_read = %s, payments_manage = %s WHERE id = %s
-    """
-    data = (role.company_id, role.created_by_id, role.name, role.description, role.created_at, role.users_read,
-            role.users_manage, role.inventory_read, role.inventory_manage, role.services_read, role.services_manage,
-            role.items_read, role.items_manage, role.payments_read, role.payments_manage, role.id)
+    # Base query
+    query = "UPDATE roles SET "
+    data = []
+    
+    # Dynamically add fields that are not None
+    fields = [
+        ("company_id", role.company_id),
+        ("created_by_id", role.created_by_id),
+        ("name", role.name),
+        ("description", role.description),
+        ("created_at", role.created_at),
+        ("users_read", role.users_read),
+        ("users_manage", role.users_manage),
+        ("inventory_read", role.inventory_read),
+        ("inventory_manage", role.inventory_manage),
+        ("services_read", role.services_read),
+        ("services_manage", role.services_manage),
+        ("items_read", role.items_read),
+        ("items_manage", role.items_manage),
+        ("payments_read", role.payments_read),
+        ("payments_manage", role.payments_manage)
+    ]
+
+    update_fields = []
+    for field, value in fields:
+        if value is not None:
+            update_fields.append(f"{field} = %s")
+            data.append(value)
+
+    query += ", ".join(update_fields)
+    query += " WHERE id = %s"
+    data.append(role.id)
+
     cursor = connection.cursor()
-    cursor.execute(query, data)
+    cursor.execute(query, tuple(data))
     connection.commit()
+
 
 
 def delete_role_by_id(role_id: int):

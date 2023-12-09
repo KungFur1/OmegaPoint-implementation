@@ -18,15 +18,15 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS admins (
     user_id INT PRIMARY KEY,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS company_users_data (
     user_id INT PRIMARY KEY,
-    company_id INT,
-    position INT NOT NULL DEFAULT 1,
-    FOREIGN KEY (company_id) REFERENCES company(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    company_id INT NOT NULL,
+    position INT NOT NULL,
+    FOREIGN KEY (company_id) REFERENCES company(id) ON DELETE SET NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS roles (
@@ -46,16 +46,16 @@ CREATE TABLE IF NOT EXISTS roles (
     items_manage BOOLEAN NOT NULL,
     payments_read BOOLEAN NOT NULL,
     payments_manage BOOLEAN NOT NULL,
-    FOREIGN KEY (company_id) REFERENCES company(id),
-    FOREIGN KEY (created_by_id) REFERENCES users(id)
+    FOREIGN KEY (company_id) REFERENCES company(id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS assigned_roles (
     user_id INT NOT NULL,
     role_id INT NOT NULL,
     PRIMARY KEY (user_id, role_id),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (role_id) REFERENCES roles(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
 );
 
 
@@ -108,6 +108,10 @@ VALUES
 INSERT INTO admins (user_id)
 VALUES 
 ((SELECT id FROM users WHERE email = 'jane.smith@example.com'));
+
+INSERT INTO admins (user_id)
+VALUES 
+((SELECT id FROM users WHERE email = 'user@example.com'));
 
 -- Inserting into Company
 INSERT INTO company (email, `name`)

@@ -5,11 +5,11 @@ from typing import Optional
 
 class RoleModel(BaseModel):
     id: int = Field(default=None)
-    company_id: int
-    created_by_id: int
+    company_id: int = Field(default=None)
+    created_by_id: int = Field(default=None)
     name: constr(min_length=3, max_length=50)
-    description: Optional[constr(max_length=200)]
-    created_at: Optional[datetime] = Field(default_factory=datetime.now)
+    description: Optional[constr(max_length=200)] = Field(default=None)
+    created_at: Optional[datetime] = Field(default=None)
     users_read: bool
     users_manage: bool
     inventory_read: bool
