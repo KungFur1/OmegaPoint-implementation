@@ -33,7 +33,7 @@ async def user_login(login_data : UserLoginModel = fastapi.Body(default=None)):
 
 
 # Register a company owner user, done by the system administrators only
-@router.post("/cinematic/company/users/owner/register", tags=["company_users", "register", "owners"], status_code=201)
+@router.post("/cinematic/users/company/owner/register", tags=["company_users", "register", "owners"], status_code=201)
 async def owner_register(owner_data : UserModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     try:
         if db.get_admin_information_by_id(user_id=user_identification.id):
@@ -51,7 +51,7 @@ async def owner_register(owner_data : UserModel = fastapi.Body(default=None), us
 
 
 # Register a company manager user, done by the company owner users only
-@router.post("/cinematic/company/users/manager/register", tags=["company_users", "register", "owners", "managers"], status_code=201)
+@router.post("/cinematic/users/company/manager/register", tags=["company_users", "register", "owners", "managers"], status_code=201)
 async def manager_register(manager_data : UserModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     try:
         company_data = db.get_user_company_data(user_id=user_identification.id)
@@ -67,7 +67,7 @@ async def manager_register(manager_data : UserModel = fastapi.Body(default=None)
 
 
 # Register a company employee user, done by the company manager users and company owner users only
-@router.post("/cinematic/company/users/employee/register", tags=["company_users", "register", "owners", "managers", "employees"], status_code=201)
+@router.post("/cinematic/users/company/employee/register", tags=["company_users", "register", "owners", "managers", "employees"], status_code=201)
 async def employee_register(employee_data : UserModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     try:
         company_data = db.get_user_company_data(user_id=user_identification.id)
@@ -89,25 +89,25 @@ async def employee_register(employee_data : UserModel = fastapi.Body(default=Non
 # ENDPOINTS FOR COMPANY MANAGERS/OWNERS FOR MANAGING COMPANY USERS
 
 # Get all company users
-@router.get("/cinematic/company/users", tags=["company_users", "managers", "owners"], status_code=200)
+@router.get("/cinematic/users/company", tags=["company_users", "managers", "owners"], status_code=200)
 async def get_all_company_users(user_identification = fastapi.Depends(authorization_wrapper)):
     return {}
 
 
 # Get a specific user from the company 
-@router.get("/cinematic/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=200)
+@router.get("/cinematic/users/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=200)
 async def get_user_by_id(user_identification = fastapi.Depends(authorization_wrapper)):
     return {}
 
 
 # Update company employee (EXCEPT Owner/Manager), Owner can update any user
-@router.put("/cinematic/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=200)
+@router.put("/cinematic/users/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=200)
 async def update_company_user(employee_data : UserModel = fastapi.Body(default=None), user_identification = fastapi.Depends(authorization_wrapper)):
     return {}
 
 
 # Delete user, that was created by that company (EXCEPT Owner/Manager), Owner can delete any user
-@router.delete("/cinematic/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=204)
+@router.delete("/cinematic/users/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=204)
 async def delete_company_user(user_identification = fastapi.Depends(authorization_wrapper)):
     return {}
 
