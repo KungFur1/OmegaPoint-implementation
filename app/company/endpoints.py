@@ -40,7 +40,7 @@ async def create_company(company_data : CompanyModel = fastapi.Body(default=None
         raise fastapi.HTTPException(status_code=500, detail="database error")
 
 
-@router.post("/cinematic/company", tags=["company"], status_code=201)
+@router.put("/cinematic/company", tags=["company"], status_code=201)
 async def edit_company(company_data : CompanyModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     # Not implemented yet
     return {}
