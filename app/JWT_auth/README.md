@@ -28,7 +28,7 @@ The `authorization_wrapper` function will automatically throw an error if there 
 You do not need to handle these errors, these errors are integrated with fastapi and will return an HTTPException to the user automaticaly (The front-end will then ask the user to re-login).
 But the point of this section is: **do not use `authorization_wrapper` in endpoints that don't need authorization**, because the users who haven't logged in won't be able to access those endpoints.
 
-## Modules Overview (for developers who will be working on this folder)
+## Modules Overview (for developers who will be working on this package)
 
 ### `authentication.py`
 This module is responsible for handling user authentication. It provides functionality for password hashing and verification.
