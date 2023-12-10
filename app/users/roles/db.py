@@ -1,8 +1,18 @@
 from app.db_connection import mysql_connection
-from app.users.roles.model import RoleModel
+from app.users.roles.model import RoleModel, AssignedRole
 from typing import List, Optional
 
 connection = mysql_connection()
+
+
+def get_assgined_roles_by_user_id(user_id: int) -> List[AssignedRole]:
+    cursor = connection.cursor(dictionary=True)
+    query = "SELECT user_id, role_id FROM assigned_roles WHERE user_id = %s"
+    cursor.execute(query, (user_id,))
+    result = cursor.fetchall()
+    cursor.close()
+    return [AssignedRole(**row) for row in result]
+
 
 
 def post_role(role: RoleModel):

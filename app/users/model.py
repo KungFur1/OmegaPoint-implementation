@@ -65,27 +65,10 @@ class UserAuthenticationDataModel(BaseModel):
     email : EmailStr
     password : str
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "user_id": 12345,
-                "email": "user@example.com",
-                "password": "abc",
-            }
-        }
-
 
 class AdminInformationModel(BaseModel):
     user_id: int
     created_at: datetime
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "id": 2,
-                "created_at": "2023-12-05T00:00:00"
-            }
-        }
 
 
 class UserCompanyDataModel(BaseModel):
@@ -93,11 +76,13 @@ class UserCompanyDataModel(BaseModel):
     company_id : int
     position : CompanyPositions
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "user_id": 931,
-                "company_id": 16,
-                "position": 2,
-            }
-        }
+
+class UserRegularDataModel(BaseModel):
+    id : int
+    email : EmailStr
+
+    created_at : datetime
+    phone_number : str
+    first_name : str
+    last_name : str
+    address : str

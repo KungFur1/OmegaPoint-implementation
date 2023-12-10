@@ -42,3 +42,8 @@ app.include_router(users_router)
 app.include_router(company_router)
 app.include_router(roles_router)
 
+from app.JWT_auth.authorization import get_complete_user_information
+
+@app.get("/test0", tags=["test"])
+def test():
+    return get_complete_user_information(6)

@@ -41,3 +41,9 @@ class RoleModel(BaseModel):
                 "created_by": 2
             }
         }
+
+
+class AssignedRole(BaseModel):
+    user_id: int
+    role_id: int
+
