@@ -5,7 +5,8 @@ The goal of this folder is to provide authentication and authorization functiona
 
 ### Steps
 * Import these modules: `authorization.py` and `user_identification.py`
-* In your endpoint function parameters add: `user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)` - behind the scenes `authorization_wrapper` function will extract the JWT from the HTTP header, then verify and decode it into user id and email. It will then return the data in the form of `UserIdentification` object and put it in the user_identification variable, which you can use inside your endpoint function.
+* In your endpoint function parameters add: `user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)`.
+* Behind the scenes `authorization_wrapper` function will extract the JWT from the HTTP header, then verify and decode it into user id and email. It will then return the data in the form of `UserIdentification` object and put it in the user_identification variable, which you can use inside your endpoint function.
 * This user identification information is a source of truth, that the user with that ID and Email, has logged in and is authorized to use the resources that he should have access to.
 * Finally you can use the user id from `UserIdentification`, to get access to all of the user's information.
 * Use `get_complete_user_information(user_id: int) -> CompleteUserInformation`.
