@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime
 from app.users.model import CompanyPositions
-from app.JWT_auth.roles_handler import AccessModel
+from app.users.roles.access_handler import AccessModel
 
 
 # Users authorized information, returned by authorization_wrapper
