@@ -42,8 +42,10 @@ app.include_router(users_router)
 app.include_router(company_router)
 app.include_router(roles_router)
 
-from app.JWT_auth.authorization import get_complete_user_information
+from app.JWT_auth.authorization import authorization_wrapper, get_complete_user_information
+from app.JWT_auth.user_identification import UserIdentification, CompleteUserInformation
 
-@app.get("/test0", tags=["test"])
-def test():
-    return get_complete_user_information(6)
+@app.get("/example", tags=["example"])
+def test(user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+    logged_in_user_info = get_complete_user_information(user_identification.id)
+    return {"Hello" : logged_in_user_info.email}

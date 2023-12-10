@@ -4,12 +4,14 @@ from app.users.model import CompanyPositions
 from app.JWT_auth.roles_handler import AccessModel
 
 
+# Users authorized information, returned by authorization_wrapper
 class UserIdentification:
     def __init__(self, id : int, email : str) -> None:
         self.id = id
         self.email = email
         
 
+# Complete user information, returned by get_complete_user_information
 class CompleteUserInformation(BaseModel):
     id : int
     email : EmailStr

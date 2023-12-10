@@ -5,7 +5,6 @@ from app.JWT_auth.jwt_handler import decodeJWT
 from app.JWT_auth.user_identification import UserIdentification, CompleteUserInformation
 from mysql.connector import Error as DBError
 import app.users.db as users_db
-import app.users.roles.db as roles_db
 from app.JWT_auth.roles_handler import AccessModel, get_user_access
 from app.users.model import UserCompanyDataModel
 
@@ -17,11 +16,8 @@ def authorization_wrapper(auth : HTTPAuthorizationCredentials = Security(_securi
     return decodeJWT(auth.credentials)
 
 
+# Pass authorized user id to this function to get complete information about user, returns None in case of database error 
 def get_complete_user_information(user_id: int) -> CompleteUserInformation:
-    # Get from users table
-    # Get from company users table
-    # If company user, get users access
-    # Merge all information and return
     try:
         regular_user_data = users_db.get_user_regular_data(user_id=user_id)
         company_user_data = users_db.get_user_company_data(user_id=user_id)
@@ -36,6 +32,5 @@ def get_complete_user_information(user_id: int) -> CompleteUserInformation:
                                                             phone_number=regular_user_data.phone_number, first_name=regular_user_data.first_name, 
                                                             last_name=regular_user_data.last_name, address=regular_user_data.address)
         return complete_user_information
-    except DBError as e:
-        print(f"ERROR: {e}")
+    except DBError:
         return None
