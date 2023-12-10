@@ -5,7 +5,7 @@ from app.JWT_auth.jwt_handler import decodeJWT
 from app.JWT_auth.user_identification import UserIdentification, CompleteUserInformation
 from mysql.connector import Error as DBError
 import app.users.db as users_db
-from app.JWT_auth.roles_handler import AccessModel, get_user_access
+from app.users.roles.access_handler import AccessModel, get_user_access
 from app.users.model import UserCompanyDataModel
 
 _security = HTTPBearer()
