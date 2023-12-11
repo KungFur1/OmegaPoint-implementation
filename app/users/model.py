@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from enum import Enum
 
 
@@ -72,9 +72,9 @@ class AdminInformationModel(BaseModel):
 
 
 class UserCompanyDataModel(BaseModel):
-    user_id : int
-    company_id : int
-    position : CompanyPositions
+    user_id : Optional[int]
+    company_id : Optional[int]
+    position : Optional[CompanyPositions]
 
 
 class UserRegularDataModel(BaseModel):

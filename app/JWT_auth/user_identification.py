@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime
 from app.users.model import CompanyPositions
 from app.users.roles.access_handler import AccessModel
+from typing import Optional
 
 
 # Users authorized information, returned by authorization_wrapper
@@ -16,9 +17,9 @@ class CompleteUserInformation(BaseModel):
     id : int
     email : EmailStr
 
-    company_id : int = Field(default = None)
-    position : CompanyPositions = Field(default=None)
-    access : AccessModel = Field(default = None)
+    company_id : Optional[int] = Field(default = None)
+    position : Optional[CompanyPositions] = Field(default=None)
+    access : Optional[AccessModel] = Field(default = None)
 
     created_at : datetime
     phone_number : str
