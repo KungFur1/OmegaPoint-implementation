@@ -126,7 +126,6 @@ def put_role(role: RoleModel):
     connection.commit()
 
 
-
 def delete_role_by_id(role_id: int):
     query = "DELETE FROM roles WHERE id = %s"
     cursor = connection.cursor()

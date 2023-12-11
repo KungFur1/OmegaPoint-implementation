@@ -1,7 +1,7 @@
 # Roles CRUD is only accessible to managers and owners of the company.
 import fastapi
-from app.JWT_auth.user_identification import UserIdentification # Authorization!
-from app.JWT_auth.authorization import authorization_wrapper # Authorization!
+from app.JWT_auth.user_identification import UserIdentification
+from app.JWT_auth.authorization import authorization_wrapper
 import app.users.roles.db as db
 import app.users.db as users_db
 from mysql.connector import Error as DBError
@@ -85,9 +85,6 @@ async def update_role(role_id: int, role_data : RoleModel = fastapi.Body(default
 
 @router.delete("/cinematic/roles/company/{role_id}", tags=["users", "roles"], status_code=204)
 async def delete_role(role_id: int, user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
-    # Retrieve the role`s company_id
-    # Check if user is owner or manager, check if user belongs to that company.
-    # If user is, delete the role
     try:
         role = db.get_role_by_id(role_id=role_id)
         if role:
