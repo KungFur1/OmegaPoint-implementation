@@ -3,34 +3,34 @@ This package contains all logic related to user. This is a crucial package for O
 
 ## Users Definition
 There are 3 types of users in the system:
-1. Regular user - this is a customer of the point of sale system. It is the most common type of user. This user should not have access to any of the company logic.
-2. Company user - a user that is linked to some company. This type of user is always created directly under the company and is split into 3 sub types:
-    1. Owner - can create managers and employees, can read/manage any company resources.
-    2. Manager - can create employees, can read/manage any company resources.
-    3. Employee - is assigned a role or multiple roles and these roles define which company resources employee can read/manage. (read more about roles in `users.roles` package)
-3. Admin user - can only be created manually by inserting admin data into the database. Is mainly used for creating companies and owners.
+1. **Regular user** - this is a customer of the point of sale system. It is the most common type of user. This user should not have access to any of the company logic.
+2. **Company user** - a user that is linked to some company. This type of user is always created directly under the company and is split into 3 sub types:
+    1. **Owner** - can create managers and employees, can read/manage any company resources.
+    2. **Manager** - can create employees, can read/manage any company resources.
+    3. **Employee** - is assigned a role or multiple roles and these roles define which company resources employee can read/manage. (read more about roles in `users.roles` package)
+3. **Admin user** - can only be created manually by inserting admin data into the database. Is mainly used for creating companies and owners.
 
 ### User Data
 ```python
 class UserModel(BaseModel):
-    # Main authentication data
+    # Authentication data
     id : int = Field(default=None)
     email : EmailStr = Field(default = None)
     password : str = Field(default = None)
 
-    # Company functionality data, this is only relavant to the company users
+    # Company data, this is only relavant to the company users
     company_id : int = Field(default = None)
     position : CompanyPositions = Field(default=CompanyPositions.EMPLOYEE)
     roles : List[int] = Field(default = None)
 
-    # Extra user information
+    # Extra information
     created_at : datetime = Field(default=None)
     phone_number : str = Field(default = None)
     first_name : str = Field(default = None)
     last_name : str = Field(default = None)
     address : str = Field(default = None)
 ```
-All 3 types of users have **main authentication data** and **extra user information**. Company users also have **company functionality data**.
+All 3 types of users have **authentication data** and **extra information**. Company users also have **company data**.
 
 
 ## Modules Overview
