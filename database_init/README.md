@@ -1,0 +1,2 @@
+# Database Initialization
+Here we add database initialization files. Name the files according to your component: `<component name>_init.sql`. Test your queries before uploading, you should be able to run all queries at once, by selecting all of them. Also create some test data, you can even create data for other components if you need to (for example users), just keep everything in your file. Later a problem might arise where one table relies on a table from another init file and the order of execution is unclear, lets solve this problem in group chat.
