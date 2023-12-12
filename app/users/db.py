@@ -1,4 +1,3 @@
-# All db functions might raise mysql.connector.Error
 from app.db_connection import mysql_connection
 import mysql.connector
 from app.users.model import UserModel, UserLoginModel, CompanyPositions, UserAuthenticationDataModel, AdminInformationModel

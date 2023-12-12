@@ -1,11 +1,6 @@
-# {"data" : data} - when returning some data
-# {"info" : success_message} - when some operation was successful
-# raise fastapi.HTTPException - when something is wrong, provide detail
-# all messages should start with non-capital letter and end without a dot
-# {"token" : token} - when user logs in
 import fastapi
-from app.JWT_auth.user_identification import UserIdentification # Authorization!
-from app.JWT_auth.authorization import authorization_wrapper # Authorization!
+from app.JWT_auth.user_identification import UserIdentification
+from app.JWT_auth.authorization import authorization_wrapper
 from app.users.model import UserModel, UserLoginModel, CompanyPositions, UserAuthenticationDataModel
 import app.users.db as db
 import app.company.db as company_db
