@@ -55,7 +55,6 @@ async def upload_role(role_data : RoleModel = fastapi.Body(default=None), user_i
         else:
             raise fastapi.HTTPException(status_code=400, detail="you must be manager or owner to post company roles")
     except DBError as e:
-        print(f"Error: {e}")
         raise fastapi.HTTPException(status_code=500, detail="database error")
 
 
@@ -79,7 +78,6 @@ async def update_role(role_id: int, role_data : RoleModel = fastapi.Body(default
         else:
             raise fastapi.HTTPException(status_code=400, detail="the role you are trying to access does not exist")
     except DBError as e:
-        print(f"Error: {e}")
         raise fastapi.HTTPException(status_code=500, detail="database error")
 
 
@@ -100,5 +98,39 @@ async def delete_role(role_id: int, user_identification : UserIdentification = f
         else:
             raise fastapi.HTTPException(status_code=400, detail="the role you are trying to delete does not exist")
     except DBError as e:
-        print(f"Error {e}")
         raise fastapi.HTTPException(status_code=500, detail="database error")
+
+# CODE REFACTOR, DO MANY FUNCTIONS THAT CHECK SOMETHING, LIKE IF THE TWO USERS WORK IN THE SAME COMPANY, etc..
+# Role assignment endpoints
+
+@router.get("/cinematic/roles/users/{user_id}", tags=["users", "roles"], status_code=200)
+async def get_assigned_roles(user_id: int, user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+    # Check if the authorized user is Owner or Manager and if user_id company matches authorized user company
+    # If yes get_assigned_roles_by_id
+    try:
+        authorized_user_company_data = users_db.get_user_company_data(user_id=user_identification.id)
+        parameter_user_company_data = users_db.get_user_company_data(user_id=user_id)
+        if authorized_user_company_data and (authorized_user_company_data.position == CompanyPositions.MANAGER or authorized_user_company_data.position == CompanyPositions.OWNER):
+            if parameter_user_company_data and parameter_user_company_data.company_id == authorized_user_company_data.company_id:
+                return {"data" : db.get_assgined_roles_by_user_id(user_id=user_id)}
+            else:
+                raise fastapi.HTTPException(status_code=400, detail="you are not in the same company as the provided user")
+        else:
+            raise fastapi.HTTPException(status_code=400, detail="you must be a manager or owner user to get assigned roles")
+    except DBError:
+        raise fastapi.HTTPException(status_code=500, detail="database error")
+    return {}
+
+
+@router.get("/cinematic/roles/users/{role_id}", tags=["users", "roles"], status_code=200)
+async def get_users_with_role(role_id: int, user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+    # Check if the authorized user is Owner or Manager and if the role_id company matches authorized user company
+    # If yes get users by role
+    return {}
+
+
+@router.post("/cinematic/roles/users/{role_id}/{user_id}", tags=["users", "roles"], status_code=201)
+async def assign_role(role_id: int, user_id: int, user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+    # Check if the authorized user is owner or manager and if both the role the user and the authorized user belong to the same company
+    # If yes assign the role
+    return {}
