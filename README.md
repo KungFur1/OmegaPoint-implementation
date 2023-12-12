@@ -2,7 +2,7 @@
 OmegaPoint-implementation is a point of sale system for HoReCa and beauty secotrs.
 
 ## Description
-This is a group project for university. The task is to implement a system based on other group`s specification (the specification can be found in 'SpecificationDocuments' folder). However, we made a few changes in the endpoint structure, due to errors in the specification. We are planning provide a document on the changes we made to the specifcaition.
+This is a group project for university. The task is to implement a system based on other group`s specification (the specification can be found in 'SpecificationDocuments' folder). However, we made a few changes in the endpoint structure, due to errors in the specification. We are planning to provide a document on the changes we made to the specifcaition.
 
 ## Installing and Executing program
 
@@ -14,5 +14,36 @@ This is a group project for university. The task is to implement a system based 
 * Your project is setup, now run it: `uvicorn my_app:app --reload`
 * Follow the terminal link and go to '/docs'.
 
+## Linking to Database
+
+* Install MySQL server and admin.
+* Setup your database with the same parameters as in the `.env` file.
+* Go to `database_init` folder and run all sql queries inside MySQL admin.
+
 ## Project Structure
-...
+
+### SpecificationDocuments
+In this folder you will find the OmegaPoint system specification document, our system's architecture and endpoints are based on this document. However we made quite significant changes to the endpoints and some minor changes to the functionality due to errors in the specification. These changes will be reflected in the `SpecificationDocuments` folder as well.
+
+### app
+The logic behind OmegaPoint. This is where all scripts are. Inside you will find a folder for every component:
+* users
+* company
+* services
+* items
+* orders
+* payments
+* db_connection
+* JWT_auth
+
+### database_init
+All files for database initialization.
+
+### .env
+System's configuration file.
+
+### my_app.py
+The main script, you should run this script when starting the project. Mainly it just initializes fastAPI and imports all of the endpoints from all the different modules.
+
+### requirements.txt
+System's dependencies are defined here. This file is also used to install the dependecies with terminal command: `pip install -r requirements.txt`.
