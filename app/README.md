@@ -88,7 +88,7 @@ class CompanyModel(BaseModel):
 If you need, you can always define additional modules in your package. If your package has a lot of logic going on it is very natural to separate that logic into another file. If your component is fairly big, you should also consider splitting your component into a few sub components. For example in `users` there is a sub component `roles`.
 
 ### Notes
-Don't forget to add your database initialization files to `database_init` folder. For more inforamtion users and authorization refer to `users` and `JWT_auth` README.md files.
+Don't forget to add your database initialization files to `database_init` folder. For more information about users and authorization refer to `users` and `JWT_auth` README.md files.
 
 ## Every Component Overview
 
