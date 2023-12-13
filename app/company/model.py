@@ -8,12 +8,15 @@ class CompanyModel(BaseModel):
     name: str
     created_at: datetime = Field(default=None)
 
+
+class CompanyCreateModel(BaseModel):
+    email: EmailStr
+    name: str
+
     class Config:
         json_schema_extra = {
             "example": {
-                "id": 57,
                 "email": "user@example.com",
-                "name": "UAB gpt technologies",
-                "created_at": "2023-12-05T00:00:00"
+                "name": "UAB gpt technologies"
             }
         }

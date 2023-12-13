@@ -1,7 +1,7 @@
 import fastapi
 from app.JWT_auth.user_identification import UserIdentification
 from app.JWT_auth.authorization import authorization_wrapper
-from app.company.model import CompanyModel
+from app.company.model import CompanyCreateModel
 import app.company.db as db
 import app.users.db as users_db
 from mysql.connector import Error as DBError
@@ -25,7 +25,7 @@ async def get_company_by_id(company_id : int):
 
 @router.post("/cinematic/company", tags=["company"], status_code=201)
 @handle_db_error
-async def create_company(company_data : CompanyModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+async def create_company(company_data : CompanyCreateModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     if users_db.get_admin_information_by_id(user_id=user_identification.id) is None:
         raise fastapi.HTTPException(status_code=400, detail="you must be admin user to create a company")
     db.post_company(company_data)
@@ -34,7 +34,7 @@ async def create_company(company_data : CompanyModel = fastapi.Body(default=None
 
 @router.put("/cinematic/company", tags=["company"], status_code=201)
 @handle_db_error
-async def edit_company(company_data : CompanyModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+async def edit_company(company_data : CompanyCreateModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     # Not implemented yet
     return {}
 
