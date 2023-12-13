@@ -26,11 +26,10 @@ async def get_company_by_id(company_id : int):
 @router.post("/cinematic/company", tags=["company"], status_code=201)
 @handle_db_error
 async def create_company(company_data : CompanyModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
-    if users_db.get_admin_information_by_id(user_id=user_identification.id):
-        db.post_company(company_data)
-        return {"info" : "company succesfully inserted"}
-    else:
+    if users_db.get_admin_information_by_id(user_id=user_identification.id) is None:
         raise fastapi.HTTPException(status_code=400, detail="you must be admin user to create a company")
+    db.post_company(company_data)
+    return {"info" : "company succesfully inserted"}
 
 
 @router.put("/cinematic/company", tags=["company"], status_code=201)

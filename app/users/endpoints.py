@@ -16,11 +16,11 @@ router = fastapi.APIRouter()
 # Register a regular user
 @router.post("/cinematic/users/register", tags=["regular_users", "register"], status_code=201)
 @handle_db_error
-async def user_register(user_data : UserModel = fastapi.Body(default=None)):
-    user_data.company_id = None
-    user_data.position = None
-    user_data.roles = None
-    return logreg.register(user_data)
+async def user_register(new_user : UserModel = fastapi.Body(default=None)):
+    new_user.company_id = None
+    new_user.position = None
+    new_user.roles = None
+    return logreg.register(new_user)
 
 
 # Login for all users
@@ -33,46 +33,46 @@ async def user_login(login_data : UserLoginModel = fastapi.Body(default=None)):
 # Register a company owner user, done by the system administrators only
 @router.post("/cinematic/users/company/owner/register", tags=["company_users", "register", "owners"], status_code=201)
 @handle_db_error
-async def owner_register(owner_data : UserModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
-    if db.get_admin_information_by_id(user_id=user_identification.id):
-        if company_db.get_company_by_id(owner_data.company_id):
-            owner_data.company_id = owner_data.company_id
-            owner_data.position = CompanyPositions.OWNER
-            owner_data.roles = None
-            return logreg.register(owner_data)
-        else:
-            raise fastapi.HTTPException(status_code=400, detail="company with provided id does not exist")
-    else:
+async def owner_register(new_owner : UserModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+    if db.get_admin_information_by_id(user_id=user_identification.id) is None:
         raise fastapi.HTTPException(status_code=400, detail="you must be admin user to register owner")
-
+    if company_db.get_company_by_id(new_owner.company_id) is None:
+        raise fastapi.HTTPException(status_code=400, detail="company with provided id does not exist")
+    
+    new_owner.company_id = new_owner.company_id
+    new_owner.position = CompanyPositions.OWNER
+    new_owner.roles = None
+    return logreg.register(new_owner)
 
 
 # Register a company manager user, done by the company owner users only
 @router.post("/cinematic/users/company/manager/register", tags=["company_users", "register", "owners", "managers"], status_code=201)
 @handle_db_error
-async def manager_register(manager_data : UserModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
-    company_data = db.get_user_company_data(user_id=user_identification.id)
-    if company_data and company_data.position == CompanyPositions.OWNER:
-        manager_data.company_id = company_data.company_id
-        manager_data.position = CompanyPositions.MANAGER
-        manager_data.roles = None
-        return logreg.register(manager_data)
-    else:
+async def manager_register(new_manager : UserModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+    auth_user_cd = db.get_user_company_data(user_id=user_identification.id)
+
+    if auth_user_cd is None or auth_user_cd.position != CompanyPositions.OWNER:
         raise fastapi.HTTPException(status_code=400, detail="you must be owner user to register manager user")
+    
+    new_manager.company_id = auth_user_cd.company_id
+    new_manager.position = CompanyPositions.MANAGER
+    new_manager.roles = None
+    return logreg.register(new_manager)
 
 
 # Register a company employee user, done by the company manager users and company owner users only
 @router.post("/cinematic/users/company/employee/register", tags=["company_users", "register", "owners", "managers", "employees"], status_code=201)
 @handle_db_error
-async def employee_register(employee_data : UserModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
-    company_data = db.get_user_company_data(user_id=user_identification.id)
-    if company_data and (company_data.position == CompanyPositions.OWNER or company_data.position == CompanyPositions.MANAGER):
-        employee_data.company_id = company_data.company_id
-        employee_data.position = CompanyPositions.EMPLOYEE
-        employee_data.roles = None
-        return logreg.register(employee_data)
-    else:
+async def employee_register(new_employee : UserModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+    auth_user_cd = db.get_user_company_data(user_id=user_identification.id)
+
+    if auth_user_cd is None or (auth_user_cd.position != CompanyPositions.OWNER and auth_user_cd.position != CompanyPositions.MANAGER):
         raise fastapi.HTTPException(status_code=400, detail="you must be owner user to register manager user")
+    
+    new_employee.company_id = auth_user_cd.company_id
+    new_employee.position = CompanyPositions.EMPLOYEE
+    new_employee.roles = None
+    return logreg.register(new_employee)
 
 
 # AUTHENTICATION END
