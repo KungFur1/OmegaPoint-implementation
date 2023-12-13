@@ -1,13 +1,13 @@
 from app.db_connection import mysql_connection
 import mysql.connector
-from app.users.model import UserModel, UserLoginModel, CompanyPositions, UserAuthenticationDataModel, AdminInformationModel
+from app.users.model import UserRegisterModel, UserLoginModel, CompanyPositions, UserAuthenticationDataModel, AdminDataModel
 from app.users.model import UserRegularDataModel, UserCompanyDataModel
 
 
 connection = mysql_connection()
 
 
-def post_user(user_data: UserModel):
+def post_user(user_data: UserRegisterModel):
     query = (
         "INSERT INTO users (email, password_hash, phone_number, first_name, last_name, address) "
         "VALUES (%s, %s, %s, %s, %s, %s)"
@@ -31,14 +31,14 @@ def get_user_authentication_data_by_email(email : str) -> UserAuthenticationData
         return None
 
 
-def get_admin_information_by_id(user_id: int) -> AdminInformationModel | None:
+def get_admin_information_by_id(user_id: int) -> AdminDataModel | None:
     query = "SELECT user_id, created_at FROM admins WHERE user_id = %s"
     cursor = connection.cursor(dictionary=True)
     cursor.execute(query, (user_id,))
     result = cursor.fetchone()
     cursor.close()
     if result:
-        return AdminInformationModel(**result)
+        return AdminDataModel(**result)
     else:
         return None
 
@@ -69,7 +69,7 @@ def get_user_company_data(user_id: int) -> UserCompanyDataModel:
 
 # When inserting company user, multiple database operations happen, 
 # there MUST NOT be a situation where one operation is succesful and other is not - we use transaction to fix that.
-def post_company_user(user_data: UserModel):
+def post_company_user(user_data: UserRegisterModel):
     cursor = connection.cursor()
     try:
         user_query = (

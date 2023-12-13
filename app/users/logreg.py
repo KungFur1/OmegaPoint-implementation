@@ -2,13 +2,13 @@ import fastapi
 from app.JWT_auth.user_identification import UserIdentification
 from app.JWT_auth.authentication import get_password_hash, verify_password
 from app.JWT_auth.jwt_handler import signJWT
-from app.users.model import UserModel, UserLoginModel, UserAuthenticationDataModel
+from app.users.model import UserRegisterModel, UserLoginModel, UserAuthenticationDataModel
 import app.users.db as db
 from mysql.connector import Error as DBError
 
 
 # ! Company fields must be None if this is not a company user
-def register(user_data : UserModel):
+def register(user_data : UserRegisterModel):
     if db.get_user_authentication_data_by_email(email=user_data.email) is not None:
         raise fastapi.HTTPException(status_code=400, detail="user with such email already exists")
     

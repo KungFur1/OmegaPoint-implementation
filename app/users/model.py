@@ -11,34 +11,43 @@ class CompanyPositions(Enum):
 
 
 class UserModel(BaseModel):
-    # Main authentication data (Required in registration)
-    id : int  = Field(default=None)
-    email : EmailStr  = Field(default = None)
-    password : str = Field(default = None)
+    # Main authentication data
+    id : int
+    email : EmailStr
+    password : str
 
     # Company functionality data
     company_id : int = Field(default = None)
-    position : CompanyPositions = Field(default=CompanyPositions.EMPLOYEE)
+    position : CompanyPositions = Field(default = None)
     roles : List[int] = Field(default = None)
 
     # Extra user information
-    created_at : datetime = Field(default=None)
-    # (Optional, but needed in registration)
-    phone_number : str = Field(default = None)
-    first_name : str = Field(default = None)
-    last_name : str = Field(default = None)
-    address : str = Field(default = None)
+    created_at : datetime
+    phone_number : str
+    first_name : str
+    last_name : str
+    address : str
+
+
+class UserRegisterModel(BaseModel):
+    email : EmailStr
+    password : str
+
+    company_id : int = Field(default = None)
+    position : CompanyPositions = Field(default = None)
+
+    phone_number : str
+    first_name : str
+    last_name : str
+    address : str
 
     class Config:
         json_schema_extra = {
             "example": {
-                "user_id": 12345,
                 "email": "user@example.com",
                 "password": "abc",
-                "position": 1,
-                "roles": [1, 2, 3],
                 "company_id": 10,
-                "created_at": "2023-12-05T00:00:00",
+                "position": 1,
                 "phone_number": "+1234567890",
                 "first_name": "Ben",
                 "last_name": "Taker",
@@ -66,7 +75,7 @@ class UserAuthenticationDataModel(BaseModel):
     password : str
 
 
-class AdminInformationModel(BaseModel):
+class AdminDataModel(BaseModel):
     user_id: int
     created_at: datetime
 
