@@ -1,7 +1,7 @@
 # Authentication and Authorization Package Documentation
 The goal of this package is to provide authentication and authorization functionality to the application.
 
-## How To Authorize? (for developers who will only use this package to authorize)
+## How to Authorize? (for developers who will only use this package to authorize)
 
 ### Steps
 * Import modules: `authorization.py` and `user_identification.py`
@@ -11,16 +11,53 @@ The goal of this package is to provide authentication and authorization function
 * Finally you can use the user id from `UserIdentification`, to get access to all of the user's information.
 * Use `get_complete_user_information(user_id: int) -> CompleteUserInformation`.
 * If the user is not a company user `CompleteUserInformation` will have these fields set to None: company_id, position, access.
+* If you use `get_complete_user_information` make sure to handle `mysql.connector.Error`.
 
 ### Example
 ```python
 from app.JWT_auth.authorization import authorization_wrapper, get_complete_user_information
 from app.JWT_auth.user_identification import UserIdentification, CompleteUserInformation
+import mysql.connector.Error
 
 @router.get("/example", tags=["example"], status_code=201)
 def test(user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
-    logged_in_user_info = get_complete_user_information(user_identification.id)
-    return {"Hello" : logged_in_user_info.email}
+    try:
+        logged_in_user_info = get_complete_user_information(user_identification.id)
+        return {"Hello" : logged_in_user_info.email}
+    except mysql.connector.Error:
+        raise HTTPException(status_code=500, detail="database error")
+```
+
+### `CompleteUserInformation`
+This is returned by `get_complete_user_information`:
+```python
+class CompleteUserInformation(BaseModel):
+    id : int
+    email : EmailStr
+
+    company_id : Optional[int] = Field(default = None)
+    position : Optional[CompanyPositions] = Field(default=None)
+    access : Optional[AccessModel] = Field(default = None)
+
+    created_at : datetime
+    phone_number : str
+    first_name : str
+    last_name : str
+    address : str
+```
+You can find `AccessModel` in `app.users.roles.access_handler`:
+```python
+class AccessModel(BaseModel):
+    users_read: bool = Field(default=False)
+    users_manage: bool = Field(default=False)
+    inventory_read: bool = Field(default=False)
+    inventory_manage: bool = Field(default=False)
+    services_read: bool = Field(default=False)
+    services_manage: bool = Field(default=False)
+    items_read: bool = Field(default=False)
+    items_manage: bool = Field(default=False)
+    payments_read: bool = Field(default=False)
+    payments_manage: bool = Field(default=False)
 ```
 
 ### Important

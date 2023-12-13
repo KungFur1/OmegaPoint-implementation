@@ -1,12 +1,11 @@
 from app.db_connection import mysql_connection
-import mysql.connector
-from app.company.model import CompanyModel
+from app.company.model import CompanyModel, CompanyCreateModel
 from typing import List, Optional
 
 connection = mysql_connection()
 
 
-def post_company(company: CompanyModel):
+def post_company(company: CompanyCreateModel):
     query = "INSERT INTO company (email, name) VALUES (%s, %s)"
     values = (company.email, company.name)
     cursor = connection.cursor()
