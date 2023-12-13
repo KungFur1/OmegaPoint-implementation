@@ -45,7 +45,23 @@ app.include_router(roles_router)
 from app.JWT_auth.authorization import authorization_wrapper, get_complete_user_information
 from app.JWT_auth.user_identification import UserIdentification, CompleteUserInformation
 
-@app.get("/example", tags=["example"])
-def test(user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+@app.get("/test0", tags=["test"])
+async def test0(user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     logged_in_user_info = get_complete_user_information(user_identification.id)
     return {"Hello" : logged_in_user_info.email}
+
+
+from app.db_error_handler import handle_db_error
+from mysql.connector import Error as DBError123
+from app.users.model import UserLoginModel
+
+
+@app.post("/test1/{number}", tags=["test"])
+@handle_db_error
+async def test1(number:int, login_data : UserLoginModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+    logged_in_user_info = get_complete_user_information(user_identification.id)
+    print(logged_in_user_info.email)
+    print(number)
+    print(login_data)
+
+    raise DBError123
