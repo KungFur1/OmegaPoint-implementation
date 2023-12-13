@@ -6,7 +6,7 @@ import app.users.roles.db as db
 import app.users.db as users_db
 from mysql.connector import Error as DBError
 from app.users.model import CompanyPositions
-from app.users.roles.model import RoleModel
+from app.users.roles.model import RoleCreateModel, RoleUpdateModel
 from typing import Optional, List
 from app.db_error_handler import handle_db_error
 
@@ -40,7 +40,7 @@ async def get_role_by_id(role_id: int, user_identification : UserIdentification 
 
 @router.post("/cinematic/roles/company", tags=["users", "roles"], status_code=201)
 @handle_db_error
-async def upload_role(role_data : RoleModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+async def upload_role(role_data : RoleCreateModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
 
     if auth_user_cd is None or (auth_user_cd.position != CompanyPositions.MANAGER and auth_user_cd.position != CompanyPositions.OWNER):
@@ -54,7 +54,7 @@ async def upload_role(role_data : RoleModel = fastapi.Body(default=None), user_i
 
 @router.put("/cinematic/roles/company/{role_id}", tags=["users", "roles"], status_code=200)
 @handle_db_error
-async def update_role(role_id: int, role_data : RoleModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+async def update_role(role_id: int, role_data : RoleUpdateModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
     role = db.get_role_by_id(role_id=role_id)
 
@@ -63,9 +63,6 @@ async def update_role(role_id: int, role_data : RoleModel = fastapi.Body(default
     if role is None or auth_user_cd.company_id != role.company_id:
         raise fastapi.HTTPException(status_code=400, detail="the role does not belong to your company or does not exist")
 
-    role_data.id = role_id
-    role_data.company_id = auth_user_cd.company_id
-    role_data.created_by_id = None
     db.put_role(role_data)
     return {"info" : "role succesfully updated"}
 

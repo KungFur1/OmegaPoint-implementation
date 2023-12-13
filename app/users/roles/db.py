@@ -1,5 +1,5 @@
 from app.db_connection import mysql_connection
-from app.users.roles.model import RoleModel, AssignedRole
+from app.users.roles.model import RoleModel, RoleCreateModel, RoleUpdateModel, AssignedRole
 from typing import List, Optional
 
 connection = mysql_connection()
@@ -15,18 +15,18 @@ def get_assgined_roles_by_user_id(user_id: int) -> List[AssignedRole]:
 
 
 
-def post_role(role: RoleModel):
+def post_role(role: RoleCreateModel):
     query = """
     INSERT INTO roles (company_id, name, description, users_read, users_manage, inventory_read, inventory_manage, 
                        services_read, services_manage, items_read, items_manage, payments_read, payments_manage, 
-                       created_at, created_by_id)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                       created_by_id)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     data = (
         role.company_id, role.name, role.description, role.users_read, role.users_manage, 
         role.inventory_read, role.inventory_manage, role.services_read, role.services_manage, 
         role.items_read, role.items_manage, role.payments_read, role.payments_manage, 
-        role.created_at, role.created_by_id
+        role.created_by_id
     )
     cursor = connection.cursor()
     cursor.execute(query, data)
@@ -87,18 +87,15 @@ def get_role_by_id(role_id: int) -> Optional[RoleModel]:
     return None
 
 
-def put_role(role: RoleModel):
+def put_role(role: RoleUpdateModel):
     # Base query
     query = "UPDATE roles SET "
     data = []
     
     # Dynamically add fields that are not None
     fields = [
-        ("company_id", role.company_id),
-        ("created_by_id", role.created_by_id),
         ("name", role.name),
         ("description", role.description),
-        ("created_at", role.created_at),
         ("users_read", role.users_read),
         ("users_manage", role.users_manage),
         ("inventory_read", role.inventory_read),
