@@ -65,3 +65,10 @@ async def test1(number:int, login_data : UserLoginModel = fastapi.Body(default=N
     print(login_data)
 
     raise DBError123
+
+import app.users.db as users_db
+
+@app.post("/test2", tags=["test"])
+@handle_db_error
+async def test2():
+    return users_db.get_users_by_company(1)

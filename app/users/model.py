@@ -69,6 +69,38 @@ class UserLoginModel(BaseModel):
         }
 
 
+class CompleteUserDataModel(BaseModel):
+    id : int
+    email : EmailStr
+
+    company_id : int = Field(default = None)
+    position : CompanyPositions = Field(default = None)
+    roles : List[int] = Field(default = None)
+
+    created_at : datetime
+    phone_number : str
+    first_name : str
+    last_name : str
+    address : str
+
+
+class UserUpdateModel(BaseModel):
+    phone_number : str = Field(default = None)
+    first_name : str = Field(default = None)
+    last_name : str = Field(default = None)
+    address : str = Field(default = None)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "phone_number": "+4467891",
+                "first_name": "Gray",
+                "last_name": "Taker",
+                "address": "Kaunas, Kauno g. 27g."
+            }
+        }
+
+
 class UserAuthenticationDataModel(BaseModel):
     id : int
     email : EmailStr

@@ -1,7 +1,7 @@
 import fastapi
 from app.JWT_auth.user_identification import UserIdentification
 from app.JWT_auth.authorization import authorization_wrapper
-from app.users.model import UserRegisterModel, UserLoginModel, CompanyPositions
+from app.users.model import UserRegisterModel, UserLoginModel, CompanyPositions, UserUpdateModel
 import app.users.db as db
 import app.users.logreg as logreg
 from app.db_error_handler import handle_db_error
@@ -77,25 +77,51 @@ async def employee_register(new_employee : UserRegisterModel = fastapi.Body(defa
 @router.get("/cinematic/users/company", tags=["company_users", "managers", "owners"], status_code=200)
 @handle_db_error
 async def get_all_company_users(user_identification = fastapi.Depends(authorization_wrapper)):
-    return {}
+    auth_user_cd = db.get_user_company_data(user_id=user_identification.id)
+
+    check.is_owner_or_manager(user_company_data=auth_user_cd)
+
+    return {"data" : db.get_users_by_company(company_id=auth_user_cd.company_id)}
 
 
 # Get a specific user from the company 
 @router.get("/cinematic/users/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=200)
 @handle_db_error
 async def get_user_by_id(user_id: int, user_identification = fastapi.Depends(authorization_wrapper)):
-    return {}
+    auth_user_cd = db.get_user_company_data(user_id=user_identification.id)
+    param_user_cd = db.get_user_company_data(user_id=user_id)
+
+    check.is_owner_or_manager(user_company_data=auth_user_cd)
+    check.users_are_same_company(user1_company_data=param_user_cd, user2_company_data=auth_user_cd)
+
+    return {"data" : db.get_company_user_by_id(user_id=user_id)}
 
 
 # Update company employee (EXCEPT Owner/Manager), Owner can update any user
 @router.put("/cinematic/users/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=200)
 @handle_db_error
-async def update_company_user(user_id: int, employee_data : UserRegisterModel = fastapi.Body(default=None), user_identification = fastapi.Depends(authorization_wrapper)):
-    return {}
+async def update_company_user(user_id: int, user_update_data : UserUpdateModel = fastapi.Body(default=None), user_identification = fastapi.Depends(authorization_wrapper)):
+    auth_user_cd = db.get_user_company_data(user_id=user_identification.id)
+    param_user_cd = db.get_user_company_data(user_id=user_id)
+
+    check.is_owner_or_manager(user_company_data=auth_user_cd)
+    check.users_are_same_company(user1_company_data=param_user_cd, user2_company_data=auth_user_cd)
+    check.if_manager_then_employee(manager=auth_user_cd, employee=param_user_cd)
+
+    db.put_user(user_id=user_id, user_data=user_update_data)
+    return {"info" : "user updated successfully"}
 
 
 # Delete user, that was created by that company (EXCEPT Owner/Manager), Owner can delete any user
 @router.delete("/cinematic/users/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=204)
 @handle_db_error
 async def delete_company_user(user_id: int, user_identification = fastapi.Depends(authorization_wrapper)):
-    return {}
+    auth_user_cd = db.get_user_company_data(user_id=user_identification.id)
+    param_user_cd = db.get_user_company_data(user_id=user_id)
+
+    check.is_owner_or_manager(user_company_data=auth_user_cd)
+    check.users_are_same_company(user1_company_data=param_user_cd, user2_company_data=auth_user_cd)
+    check.if_manager_then_employee(manager=auth_user_cd, employee=param_user_cd)
+
+    db.delete_user(user_id=user_id)
+    return {"info" : "user deleted successfully"}

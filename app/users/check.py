@@ -19,5 +19,10 @@ def is_owner_or_manager(user_company_data: UserCompanyDataModel):
 
 
 def users_are_same_company(user1_company_data: UserCompanyDataModel, user2_company_data: UserCompanyDataModel):
-    if user1_company_data is None or user2_company_data is None or user2_company_data.company_id != user2_company_data.company_id:
+    if user1_company_data is None or user2_company_data is None or user1_company_data.company_id != user2_company_data.company_id:
         raise HTTPException(status_code=400, detail="users_are_same_company CHECK: failed")
+    
+
+def if_manager_then_employee(manager: UserCompanyDataModel, employee: UserCompanyDataModel):
+    if manager is None or employee is None or (manager.position == CompanyPositions.MANAGER and employee.position != CompanyPositions.EMPLOYEE):
+        raise HTTPException(status_code=400, detail="if_manager_then_employee CHECK: failed")
