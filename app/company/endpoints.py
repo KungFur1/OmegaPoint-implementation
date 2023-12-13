@@ -6,6 +6,8 @@ import app.company.db as db
 import app.users.db as users_db
 from mysql.connector import Error as DBError
 from app.db_error_handler import handle_db_error
+import app.company.check as check
+import app.users.check as users_check
 
 router = fastapi.APIRouter()
 
@@ -26,8 +28,8 @@ async def get_company_by_id(company_id : int):
 @router.post("/cinematic/company", tags=["company"], status_code=201)
 @handle_db_error
 async def create_company(company_data : CompanyCreateModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
-    if users_db.get_admin_information_by_id(user_id=user_identification.id) is None:
-        raise fastapi.HTTPException(status_code=400, detail="you must be admin user to create a company")
+    users_check.is_admin(user_id=user_identification.id)
+
     db.post_company(company_data)
     return {"info" : "company succesfully inserted"}
 

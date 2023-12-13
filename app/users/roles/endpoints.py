@@ -9,6 +9,8 @@ from app.users.model import CompanyPositions
 from app.users.roles.model import RoleCreateModel, RoleUpdateModel
 from typing import Optional, List
 from app.db_error_handler import handle_db_error
+import app.users.check as users_check
+import app.users.roles.check as check
 
 router = fastapi.APIRouter()
 
@@ -18,8 +20,7 @@ router = fastapi.APIRouter()
 async def get_roles_comp(user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
 
-    if auth_user_cd is None or (auth_user_cd.position != CompanyPositions.MANAGER and auth_user_cd.position != CompanyPositions.OWNER):
-        raise fastapi.HTTPException(status_code=400, detail="you must be manager or owner to acccess company roles")
+    users_check.is_owner_or_manager(user_company_data=auth_user_cd)
     
     return {"data" : db.get_company_roles(company_id=auth_user_cd.company_id)}
 
@@ -30,10 +31,8 @@ async def get_role_by_id(role_id: int, user_identification : UserIdentification 
     auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
     role = db.get_role_by_id(role_id=role_id)
 
-    if auth_user_cd is None or (auth_user_cd.position != CompanyPositions.MANAGER and auth_user_cd.position != CompanyPositions.OWNER):
-        raise fastapi.HTTPException(status_code=400, detail="you must be manager or owner to acccess company roles")
-    if role is None or auth_user_cd.company_id != role.company_id:
-        raise fastapi.HTTPException(status_code=400, detail="the role does not belong to your company or does not exist")
+    users_check.is_owner_or_manager(user_company_data=auth_user_cd)
+    check.role_is_same_company(role=role, user_company_data=auth_user_cd)
 
     return {"data" : role}
 
@@ -43,8 +42,7 @@ async def get_role_by_id(role_id: int, user_identification : UserIdentification 
 async def upload_role(role_data : RoleCreateModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
 
-    if auth_user_cd is None or (auth_user_cd.position != CompanyPositions.MANAGER and auth_user_cd.position != CompanyPositions.OWNER):
-        raise fastapi.HTTPException(status_code=400, detail="you must be manager or owner to post company roles")
+    users_check.is_owner_or_manager(user_company_data=auth_user_cd)
     
     role_data.company_id = auth_user_cd.company_id
     role_data.created_by_id = user_identification.id
@@ -54,16 +52,14 @@ async def upload_role(role_data : RoleCreateModel = fastapi.Body(default=None), 
 
 @router.put("/cinematic/roles/company/{role_id}", tags=["users", "roles"], status_code=200)
 @handle_db_error
-async def update_role(role_id: int, role_data : RoleUpdateModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+async def update_role(role_id: int, role_update_data : RoleUpdateModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
     role = db.get_role_by_id(role_id=role_id)
 
-    if auth_user_cd is None or (auth_user_cd.position != CompanyPositions.MANAGER and auth_user_cd.position != CompanyPositions.OWNER):
-        raise fastapi.HTTPException(status_code=400, detail="you must be manager or owner to edit company roles")
-    if role is None or auth_user_cd.company_id != role.company_id:
-        raise fastapi.HTTPException(status_code=400, detail="the role does not belong to your company or does not exist")
+    users_check.is_owner_or_manager(auth_user_cd)
+    check.role_is_same_company(role=role, user_company_data=auth_user_cd)
 
-    db.put_role(role_data)
+    db.put_role(role_update_data)
     return {"info" : "role succesfully updated"}
 
 
@@ -73,10 +69,8 @@ async def delete_role(role_id: int, user_identification : UserIdentification = f
     auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
     role = db.get_role_by_id(role_id=role_id)
     
-    if auth_user_cd is None or (auth_user_cd.position != CompanyPositions.MANAGER and auth_user_cd.position != CompanyPositions.OWNER):
-        raise fastapi.HTTPException(status_code=400, detail="you must be manager or owner to delete company roles")
-    if role is None or auth_user_cd.company_id != role.company_id:
-        raise fastapi.HTTPException(status_code=400, detail="the role does not belong to your company or does not exist")
+    users_check.is_owner_or_manager(auth_user_cd)
+    check.role_is_same_company(role=role, user_company_data=auth_user_cd)
     
     db.delete_role_by_id(role_id)
     return {"info" : "role succesfully deleted"}
@@ -90,10 +84,8 @@ async def get_assigned_roles(user_id: int, user_identification : UserIdentificat
     auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
     param_user_cd = users_db.get_user_company_data(user_id=user_id)
 
-    if auth_user_cd is None or (auth_user_cd.position != CompanyPositions.MANAGER and auth_user_cd.position != CompanyPositions.OWNER):
-        raise fastapi.HTTPException(status_code=400, detail="you must be manager or owner to access assigned roles")
-    if param_user_cd is None or param_user_cd.company_id != auth_user_cd.company_id:
-        raise fastapi.HTTPException(status_code=400, detail="you are not in the same company as the provided user or the user does not exist")
+    users_check.is_owner_or_manager(auth_user_cd)
+    users_check.users_are_same_company(user1_company_data=param_user_cd, user2_company_data=auth_user_cd)
     
     return {"data" : db.get_assgined_roles_by_user_id(user_id=user_id)}
 
