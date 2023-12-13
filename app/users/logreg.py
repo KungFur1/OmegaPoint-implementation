@@ -4,7 +4,6 @@ from app.JWT_auth.authentication import get_password_hash, verify_password
 from app.JWT_auth.jwt_handler import signJWT
 from app.users.model import UserRegisterModel, UserLoginModel, UserAuthenticationDataModel
 import app.users.db as db
-from mysql.connector import Error as DBError
 
 
 # ! Company fields must be None if this is not a company user

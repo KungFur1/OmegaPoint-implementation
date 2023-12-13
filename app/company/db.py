@@ -1,5 +1,4 @@
 from app.db_connection import mysql_connection
-import mysql.connector
 from app.company.model import CompanyModel, CompanyCreateModel
 from typing import List, Optional
 

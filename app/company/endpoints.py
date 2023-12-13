@@ -3,8 +3,6 @@ from app.JWT_auth.user_identification import UserIdentification
 from app.JWT_auth.authorization import authorization_wrapper
 from app.company.model import CompanyCreateModel
 import app.company.db as db
-import app.users.db as users_db
-from mysql.connector import Error as DBError
 from app.db_error_handler import handle_db_error
 import app.company.check as check
 import app.users.check as users_check

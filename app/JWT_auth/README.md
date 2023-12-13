@@ -11,6 +11,7 @@ The goal of this package is to provide authentication and authorization function
 * Finally you can use the user id from `UserIdentification`, to get access to all of the user's information.
 * Use `get_complete_user_information(user_id: int) -> CompleteUserInformation`.
 * If the user is not a company user `CompleteUserInformation` will have these fields set to None: company_id, position, access.
+* If you use `get_complete_user_information` make sure to handle `mysql.connector.Error`.
 
 ### Example
 ```python

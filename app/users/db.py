@@ -1,5 +1,4 @@
 from app.db_connection import mysql_connection
-import mysql.connector
 from app.users.model import UserRegisterModel, UserLoginModel, CompanyPositions, UserAuthenticationDataModel, AdminDataModel
 from app.users.model import UserRegularDataModel, UserCompanyDataModel
 

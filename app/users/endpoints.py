@@ -1,10 +1,8 @@
 import fastapi
 from app.JWT_auth.user_identification import UserIdentification
 from app.JWT_auth.authorization import authorization_wrapper
-from app.users.model import UserRegisterModel, UserLoginModel, CompanyPositions, UserAuthenticationDataModel
+from app.users.model import UserRegisterModel, UserLoginModel, CompanyPositions
 import app.users.db as db
-import app.company.db as company_db
-from mysql.connector import Error as DBError
 import app.users.logreg as logreg
 from app.db_error_handler import handle_db_error
 import app.users.check as check
@@ -31,7 +29,7 @@ async def user_login(login_data : UserLoginModel = fastapi.Body(default=None)):
     return logreg.login(login_data)
 
 
-# Register a company owner user, done by the system administrators only
+# Register a company owner, done by the system administrators only
 @router.post("/cinematic/users/company/owner/register", tags=["company_users", "register", "owners"], status_code=201)
 @handle_db_error
 async def owner_register(new_owner : UserRegisterModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
@@ -43,7 +41,7 @@ async def owner_register(new_owner : UserRegisterModel = fastapi.Body(default=No
     return logreg.register(new_owner)
 
 
-# Register a company manager user, done by the company owner users only
+# Register a company manager, done by the company owners only
 @router.post("/cinematic/users/company/manager/register", tags=["company_users", "register", "owners", "managers"], status_code=201)
 @handle_db_error
 async def manager_register(new_manager : UserRegisterModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
@@ -56,7 +54,7 @@ async def manager_register(new_manager : UserRegisterModel = fastapi.Body(defaul
     return logreg.register(new_manager)
 
 
-# Register a company employee user, done by the company manager users and company owner users only
+# Register a company employee, done by the company managers and company owners only
 @router.post("/cinematic/users/company/employee/register", tags=["company_users", "register", "owners", "managers", "employees"], status_code=201)
 @handle_db_error
 async def employee_register(new_employee : UserRegisterModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):

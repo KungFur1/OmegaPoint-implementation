@@ -88,11 +88,8 @@ def get_role_by_id(role_id: int) -> Optional[RoleModel]:
 
 
 def put_role(role: RoleUpdateModel):
-    # Base query
     query = "UPDATE roles SET "
     data = []
-    
-    # Dynamically add fields that are not None
     fields = [
         ("name", role.name),
         ("description", role.description),
