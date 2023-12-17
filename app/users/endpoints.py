@@ -72,6 +72,10 @@ async def employee_register(new_employee : UserRegisterModel = fastapi.Body(defa
 
 
 # ENDPOINTS FOR COMPANY MANAGERS/OWNERS FOR MANAGING COMPANY USERS
+# Look in to this after completing everything else:
+# For some reason roles [] doesnt update after assgning a role, I need to restart the server for it to update, very weird error, not sure why.
+# Maybe the sql query response is cached somewhere, but that seems weird.
+# Anyways I should move away from queries that merge few tables and instead merge them inside python.
 
 # Get all company users
 @router.get("/cinematic/users/company", tags=["company_users", "managers", "owners"], status_code=200)
