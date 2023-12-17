@@ -25,5 +25,6 @@ def mysql_connection():
             port=_port
         )
     except Error as e:
+        print(f"Failed to connect to database: {e}")
         connection = None
     return connection
