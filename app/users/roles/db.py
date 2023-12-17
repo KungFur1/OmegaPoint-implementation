@@ -14,6 +14,36 @@ def get_assgined_roles_by_user_id(user_id: int) -> List[AssignedRole]:
     return [AssignedRole(**row) for row in result]
 
 
+def get_assgined_roles_by_role_id(role_id: int) -> List[AssignedRole]:
+    cursor = connection.cursor(dictionary=True)
+    query = "SELECT user_id, role_id FROM assigned_roles WHERE role_id = %s"
+    cursor.execute(query, (role_id,))
+    result = cursor.fetchall()
+    cursor.close()
+    return [AssignedRole(**row) for row in result]
+
+
+def get_assigned_role(user_id: int, role_id: int) -> Optional[AssignedRole]:
+    cursor = connection.cursor(dictionary=True)
+    query = "SELECT user_id, role_id FROM assigned_roles WHERE user_id = %s AND role_id = %s"
+    cursor.execute(query, (user_id, role_id))
+    result = cursor.fetchone()
+    cursor.close()
+    
+    if result:
+        return AssignedRole(**result)
+    else:
+        return None
+    
+
+def post_assigned_role(assinged_role: AssignedRole) -> None:
+    cursor = connection.cursor()
+    query = "INSERT INTO assigned_roles (user_id, role_id) VALUES (%s, %s)"
+    cursor.execute(query, (assinged_role.user_id, assinged_role.role_id))
+    connection.commit()
+    cursor.close()
+
+
 
 def post_role(role: RoleCreateModel):
     query = """

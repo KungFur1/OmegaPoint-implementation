@@ -36,8 +36,8 @@ Some endpoints have overlapping structure. Therefore, they will be structured to
 * `DELETE /cinematic/roles/company/{role_id}` - Delete a role.
 
 ### Company role assignement endpoints (accessible to mangers/owners only) [EXTRA]
-* `GET /cinematic/roles/users/{user_id}` - Get all user's roles.
-* `GET /cinematic/roles/users/{role_id}` - Get all users with that role assigned.
+* `GET /cinematic/roles/users/byuser/{user_id}` - Get all user's roles.
+* `GET /cinematic/roles/users/byrole/{role_id}` - Get all users with that role assigned.
 * `POST /cinematic/roles/users/{role_id}/{user_id}` - Assign a role.
 
 ### Users loyalty endpoints

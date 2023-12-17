@@ -6,7 +6,7 @@ import app.users.roles.db as db
 import app.users.db as users_db
 from mysql.connector import Error as DBError
 from app.users.model import CompanyPositions
-from app.users.roles.model import RoleCreateModel, RoleUpdateModel
+from app.users.roles.model import RoleCreateModel, RoleUpdateModel, AssignedRole
 from typing import Optional, List
 from app.db_error_handler import handle_db_error
 import app.users.check as users_check
@@ -78,7 +78,8 @@ async def delete_role(role_id: int, user_identification : UserIdentification = f
 
 # Role assignment endpoints
 
-@router.get("/cinematic/roles/users/{user_id}", tags=["users", "roles"], status_code=200)
+
+@router.get("/cinematic/roles/users/byuser/{user_id}", tags=["users", "roles"], status_code=200)
 @handle_db_error
 async def get_assigned_roles(user_id: int, user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
@@ -90,17 +91,29 @@ async def get_assigned_roles(user_id: int, user_identification : UserIdentificat
     return {"data" : db.get_assgined_roles_by_user_id(user_id=user_id)}
 
 
-@router.get("/cinematic/roles/users/{role_id}", tags=["users", "roles"], status_code=200)
+@router.get("/cinematic/roles/users/byrole/{role_id}", tags=["users", "roles"], status_code=200)
 @handle_db_error
 async def get_users_with_role(role_id: int, user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
-    # Check if the authorized user is Owner or Manager and if the role_id company matches authorized user company
-    # If yes get users by role
-    return {}
+    auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
+    role = db.get_role_by_id(role_id=role_id)
+
+    users_check.is_owner_or_manager(user_company_data=auth_user_cd)
+    check.role_is_same_company(role=role, user_company_data=auth_user_cd)
+
+    return {"data" : db.get_assgined_roles_by_role_id(role_id=role_id)}
 
 
 @router.post("/cinematic/roles/users/{role_id}/{user_id}", tags=["users", "roles"], status_code=201)
 @handle_db_error
 async def assign_role(role_id: int, user_id: int, user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
-    # Check if the authorized user is owner or manager and if both the role the user and the authorized user belong to the same company
-    # If yes assign the role
-    return {}
+    auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
+    param_user_cd = users_db.get_user_company_data(user_id=user_id)
+    role = db.get_role_by_id(role_id=role_id)
+    
+    users_check.is_owner_or_manager(user_company_data=auth_user_cd)
+    users_check.users_are_same_company(user1_company_data=auth_user_cd, user2_company_data=param_user_cd)
+    check.role_is_same_company(role=role, user_company_data=auth_user_cd)
+    check.role_is_not_assigned(role_id=role_id, user_id=user_id)
+
+    db.post_assigned_role(assinged_role=AssignedRole(user_id=user_id, role_id=role_id))
+    return {"info" : "role succesfully assigned"}
