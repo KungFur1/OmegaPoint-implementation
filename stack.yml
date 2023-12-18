@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: OmegaPoint
+      MYSQL_ROOT_PASSWORD: my_password
+    ports:
+      - 3306:3306
+    volumes:
+      - ./database_init:/docker-entrypoint-initdb.d
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
