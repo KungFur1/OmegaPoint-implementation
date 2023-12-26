@@ -50,3 +50,10 @@ Some endpoints have overlapping structure. Therefore, they will be structured to
 * `PUT /cinematic/company` - Edit company details, only accessible to company owners.
 * `DELETE /cinematic/company` - Delete a company, only accessbile to system administrators only.
 
+### Store endpoints
+*  `GET /cinematic/stores` - Get all stores.
+* `GET /cinematic/stores/{store_id}` - Get specific company.
+* `POST /cinematic/stores` - Create a store, only accesible to owners and managers.
+* `PUT /cinematic/stores/{store_id}` - Edit store details, only accesible to owners and managers.
+* `DELETE /cinematic/stores/{store_id}` - Delete a store, only accesible to owners and managers.
+
