@@ -12,31 +12,84 @@ class OrderStatuses(Enum):
 class OrderModel(BaseModel):
     id : int
     user_id : int
+    assignee_id : Optional[int] = Field(default=None)
     company_id : int
     products : List[int]
     quantities : List[int]
     total_price : float
     created_at : datetime = Field(default_factory=lambda: datetime.now())
-    status : int
+    updated_at: Optional[datetime] = Field(default_factory=lambda: datetime.now())
+    status : OrderStatuses
 
 class OrderPostModel(BaseModel):
-    user_id : int
     company_id : int
+    assignee_id : Optional[int] = Field(default=None)
     products: List[int]
     quantities: List[int] 
     created_at : datetime = Field(default_factory=lambda: datetime.now())
-    status : int
+    status : OrderStatuses
 
     class Config:
+        use_enum_values = True
         json_schema_extra = {
             "example": {
-                "user_id": 1,
                 "company_id": 1,
+                "assignee_id": None,
                 "products": [1, 5],
                 "quantities": [5, 3], 
-                "Created_at": "2021-09-11 12:00:00",
-                "status": OrderStatuses.PENDING.value
+                "status": OrderStatuses.PENDING
             }
         }
 
 
+class OrderUpdateModel(BaseModel):
+    company_id : int
+    assignee_id : Optional[int] = Field(default=None)
+    products: List[int]
+    quantities: List[int] 
+    status : OrderStatuses
+    updated_at: Optional[datetime] = Field(default_factory=lambda: datetime.now())
+
+    class Config:
+        use_enum_values = True
+        json_schema_extra = {
+            "example": {
+                "company_id": 1,
+                "assignee_id": None,
+                "products": [1, 5],
+                "quantities": [5, 3], 
+                "status": OrderStatuses.PENDING
+            }
+        }
+
+
+class DiscountModel(BaseModel):
+    name : str
+    order_id : int
+    percentage_discount : Optional[float] = Field(default=None)
+    amount_discount : Optional[float] = Field(default=None)
+    created_at : datetime = Field(default_factory=lambda: datetime.now())
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "10 euros discount",
+                "order_id": 1,
+                "percentage_discount": None,
+                "amount_discount": 10
+            }
+        }
+
+
+class OrderItemModel(BaseModel):
+    item_id : int
+    quantity : int
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "item_id": 1,
+                "quantity": 5
+            }
+        }
+    

@@ -1,12 +1,15 @@
 from datetime import datetime
+from http.client import HTTPException
 from app.JWT_auth.authorization import get_complete_user_information
+from app.JWT_auth.user_identification import UserIdentification
 from app.db_connection import mysql_connection
-from app.orders.model import OrderModel, OrderPostModel
+from app.orders.model import DiscountModel, OrderItemModel, OrderModel, OrderPostModel, OrderStatuses, OrderUpdateModel
 from typing import List, Optional
 
-connection = mysql_connection()
+from app.users.model import CompanyPositions
 
-def post_order(new_order: OrderPostModel):
+def post_order(new_order: OrderPostModel, user_id):
+    connection = mysql_connection()
     # Start a transaction
     connection.start_transaction()
 
@@ -27,7 +30,7 @@ def post_order(new_order: OrderPostModel):
             "INSERT INTO orders (user_id, company_id, total_price, created_at, status) "
             "VALUES (%s, %s, %s, %s, %s)"
         )
-        order_values = (new_order.user_id, new_order.company_id, total_price, new_order.created_at, new_order.status)
+        order_values = (user_id, new_order.company_id, total_price, new_order.created_at, new_order.status)
         cursor = connection.cursor(buffered=True)
         cursor.execute(order_query, order_values)
         
@@ -41,57 +44,411 @@ def post_order(new_order: OrderPostModel):
             cursor.execute(item_query, (order_id, item_id, quantity))
 
         connection.commit()
-        cursor.close()
         return {"info": "Order and order items created", "order_id": order_id}
 
     except Exception as e:
         connection.rollback()
-        cursor.close()
         return {"error": str(e)}
+    finally:
+        connection.disconnect()
+        connection.close()
+        cursor.close()
 
 
 def get_orders(user_id: int) -> List[OrderModel]:
+    connection = mysql_connection()
+
     company_id = get_complete_user_information(user_id).company_id
     if company_id is None:
-        id = user_id
-        query = "SELECT id, user_id, company_id, total_price, created_at, status FROM orders WHERE user_id = %s"
+        id = ("user_id", user_id)
+        query = "SELECT id, user_id, assignee_id, company_id, total_price, created_at, updated_at, status FROM orders WHERE user_id = %s"
     else:
-        id = company_id
-        query = "SELECT id, user_id, company_id, total_price, created_at, status FROM orders WHERE company_id = %s"
+        id = ("company_id", company_id)
+        query = "SELECT id, user_id, assignee_id, company_id, total_price, created_at, updated_at, status FROM orders WHERE company_id = %s"
     
-    cursor = connection.cursor()
-    cursor.execute(query, (id,))
-    orders = cursor.fetchall()
-    cursor.close()
+    cursor_orders = connection.cursor()
+    cursor_order_item = connection.cursor()
+    try:
+        cursor_orders.execute(query, (id[1],))
+        orders = cursor_orders.fetchall()
 
-    order_models = []
-    for order in orders:
-        order_id = order[0]
-        # Query to get order items
-        item_query = "SELECT item_id, quantity FROM order_item WHERE order_id = %s"
-        cursor = connection.cursor()
-        cursor.execute(item_query, (order_id,))
-        order_items = cursor.fetchall()
-        cursor.close()
+        order_models = []
+        for order in orders:
+            order_id = order[0]
+            # Query to get order items
+            item_query = "SELECT item_id, quantity FROM order_item WHERE order_id = %s"
+            cursor_order_item.execute(item_query, (order_id,))
+            order_items = cursor_order_item.fetchall()
 
-        # Extract products and quantities
-        products = [item[0] for item in order_items]
-        quantities = [item[1] for item in order_items]
+            # Extract products and quantities
+            products = [item[0] for item in order_items]
+            quantities = [item[1] for item in order_items]
 
-        # Construct OrderModel
-        order_model = OrderModel(
-            id=order_id,
-            user_id=order[1],
-            company_id=order[2],
-            products=products,
-            quantities=quantities,
-            total_price=order[3],
-            created_at=order[4],
-            status=order[5]
-        )
-        order_models.append(order_model)
+            # Construct OrderModel
+            order_model = OrderModel(
+                id=order_id,
+                user_id=order[1],
+                assignee_id=order[2],
+                company_id=order[3],
+                products=products,
+                quantities=quantities,
+                total_price=order[4],
+                created_at=order[5],
+                updated_at=order[6],
+                status=order[7]
+            )
+            order_models.append(order_model)
 
-    if order_models:
-        return order_models
+        if order_models:
+            return order_models
+        else:
+            return {id[0]: id[1], "error": "No orders found"}
+    except Exception as e:
+        connection.rollback()
+        raise e
+    finally:
+        cursor_orders.close()
+        cursor_order_item.close()
+        connection.disconnect()
+        connection.close()
+
+
+def get_order(order_id: int, user_id: int) -> OrderModel | None:
+    connection = mysql_connection()
+
+    company_id = get_complete_user_information(user_id).company_id
+    if company_id is None:
+        id = ("user_id", user_id)
+        query = "SELECT id, user_id, assignee_id, company_id, total_price, created_at, updated_at, status FROM orders WHERE user_id = %s AND id = %s"
     else:
-        return {"company_id": company_id, "error": "No orders found"}
+        id = ("company_id", company_id)
+        query = "SELECT id, user_id, assignee_id, company_id, total_price, created_at, updated_at, status FROM orders WHERE company_id = %s AND id = %s"
+    
+    cursor_orders = connection.cursor()
+    cursor_order_item = connection.cursor()
+    try:
+        cursor_orders.execute(query, (id[1], order_id))
+        order = cursor_orders.fetchone()
+
+        if order:
+            # Query to get order items
+            item_query = "SELECT item_id, quantity FROM order_item WHERE order_id = %s"
+            cursor_order_item.execute(item_query, (order_id,))
+            order_items = cursor_order_item.fetchall()
+
+            # Extract products and quantities
+            products = [item[0] for item in order_items]
+            quantities = [item[1] for item in order_items]
+
+            # Construct OrderModel
+            order_model = OrderModel(
+                id=order[0],
+                user_id=order[1],
+                assignee_id=order[2],
+                company_id=order[3],
+                products=products,
+                quantities=quantities,
+                total_price=order[4],
+                created_at=order[5],
+                updated_at=order[6],
+                status=order[7]
+            )
+            return order_model
+        else:
+            return {id[0]: id[1], "error": "No orders found"}
+    except Exception as e:
+        connection.rollback()
+        raise e
+    finally:
+        cursor_orders.close()
+        cursor_order_item.close()
+        connection.disconnect()
+        connection.close()
+
+# ! Employee only
+def update_order(order_id: int, new_order: OrderUpdateModel, user_id: int):
+    connection = mysql_connection()
+
+    # Start a transaction
+    connection.start_transaction()
+
+    price_cursor = connection.cursor(buffered=True)
+    cursor = connection.cursor(buffered=True)
+    try:
+        format_strings = ','.join(['%s'] * len(new_order.products))
+        price_query = f"SELECT id, price FROM items WHERE id IN ({format_strings})"
+        # Execute the query with the list of product IDs
+        price_cursor.execute(price_query, tuple(new_order.products))
+
+        # Fetch the prices
+        prices = {id: price for id, price in price_cursor.fetchall()}
+
+        total_price = sum(prices[item_id] * quantity for item_id, quantity in zip(new_order.products, new_order.quantities))
+
+        order_query = (
+            "UPDATE orders SET company_id = %s, assignee_id, total_price = %s, updated_at = %s, status = %s "
+            "WHERE id = %s"
+        )
+        order_values = (new_order.company_id, new_order.assignee_id, total_price, new_order.updated_at, new_order.status, order_id)
+        cursor.execute(order_query, order_values)
+
+        if cursor.rowcount == 0:
+            raise Exception(f"{order_id} order not found")
+        
+        item_query = (
+            "DELETE FROM order_item WHERE order_id = %s"
+        )
+        cursor.execute(item_query, (order_id,))
+
+        item_query = (
+            "INSERT INTO order_item (order_id, item_id, quantity) "
+            "VALUES (%s, %s, %s)"
+        )
+        for item_id, quantity in zip(new_order.products, new_order.quantities):
+            cursor.execute(item_query, (order_id, item_id, quantity))
+
+        connection.commit()
+        return {"info": "Order and order items updated", "order_id": order_id}
+
+    except Exception as e:
+        connection.rollback()
+        return {"error": str(e)}
+    finally:
+        cursor.close()
+        price_cursor.close()
+        connection.disconnect()
+        connection.close()
+
+
+def delete_order(order_id: int, user_id: int):
+    connection = mysql_connection()
+
+    if (get_complete_user_information(user_id).company_id is None):
+        return {"error": "Regular users cannot delete orders"}
+
+    # Start a transaction
+    connection.start_transaction()
+
+    cursor = connection.cursor(buffered=True)
+    try:
+        item_query = (
+            "DELETE FROM order_item WHERE order_id = %s"
+        )
+        cursor.execute(item_query, (order_id,))
+
+        order_query = (
+            "DELETE FROM orders WHERE id = %s"
+        )
+        cursor.execute(order_query, (order_id,))
+
+        if cursor.rowcount == 0:
+            raise Exception(f"{order_id} order_id not found")
+
+        connection.commit()
+        return {"info": "Order and order items deleted", "order_id": order_id}
+
+    except Exception as e:
+        connection.rollback()
+        return {"error": str(e)}
+    finally:
+        cursor.close()
+        connection.disconnect()
+        connection.close()
+
+
+def update_order_status(order_id: int, new_status: OrderStatuses, user_id: int):
+    connection = mysql_connection()
+
+    if (get_complete_user_information(user_id).company_id is None):
+        return {"error": "Regular users cannot update order status"}
+
+    connection.start_transaction()
+    updated_at = datetime.now()
+
+    cursor = connection.cursor(buffered=True)
+    try:
+        order_query = (
+            "UPDATE orders SET status = %s, updated_at = %s"
+            "WHERE id = %s"
+        )
+        order_values = (new_status.value, updated_at, order_id)
+        cursor.execute(order_query, order_values)
+
+        if cursor.rowcount == 0:
+            raise Exception(f"{order_id} order_id not found")
+
+        connection.commit()
+        return {"info": "Order status updated", "order_id": order_id}
+
+    except Exception as e:
+        connection.rollback()
+        return {"error": str(e)}
+    finally:
+        cursor.close()
+        connection.disconnect()
+        connection.close()
+
+
+def add_discount(discount: DiscountModel):
+    connection = mysql_connection()
+    # Start a transaction
+    connection.start_transaction()
+
+    cursor = connection.cursor(buffered=True)
+    try:
+        order_query = "SELECT id FROM orders WHERE id = %s"
+        cursor.execute(order_query, (discount.order_id,))
+        if cursor.rowcount == 0:
+            raise Exception(f"{discount.order_id} order_id not found")
+
+        discount_query = (
+            "INSERT INTO discounts (name, order_id, percentage_discount, amount_discount, created_at) "
+            "VALUES (%s, %s, %s, %s, %s)"
+        )
+        discount_values = (discount.name, discount.order_id, discount.percentage_discount, discount.amount_discount, discount.created_at)
+        cursor.execute(discount_query, discount_values)
+        
+        discount_id = cursor.lastrowid
+
+        connection.commit()
+        return {"info": "Discount created", "discount_id": discount_id}
+
+    except Exception as e:
+        connection.rollback()
+        return {"error": str(e)}
+    finally:
+        cursor.close()
+        connection.disconnect()
+        connection.close()
+
+
+def assign_order(order_id: int, user_id: int):
+    connection = mysql_connection()
+
+    connection.start_transaction()
+    updated_at = datetime.now()
+
+    cursor = connection.cursor(buffered=True)
+    try:
+        order_query = (
+            "UPDATE orders SET assignee_id = %s, updated_at = %s"
+            "WHERE id = %s"
+        )
+        order_values = (user_id, updated_at, order_id)
+        cursor.execute(order_query, order_values)
+
+        if cursor.rowcount == 0:
+            raise Exception(f"{order_id} order_id not found")
+
+        connection.commit()
+        return {"info": "Order assigned", "order_id": order_id}
+
+    except Exception as e:
+        connection.rollback()
+        return {"error": str(e)}
+    finally:
+        cursor.close()
+        connection.disconnect()
+        connection.close()
+
+
+def add_order_item(order_id, order_item: OrderItemModel):
+    connection = mysql_connection()
+
+    connection.start_transaction()
+
+    cursor = connection.cursor(buffered=True)
+    try:
+        order_query = "SELECT id FROM orders WHERE id = %s"
+        cursor.execute(order_query, (order_id,))
+        if cursor.rowcount == 0:
+            raise Exception(f"{order_id} order_id not found")
+
+        item_query = "SELECT id FROM items WHERE id = %s"
+        cursor.execute(item_query, (order_item.item_id,))
+        if cursor.rowcount == 0:
+            raise Exception(f"{order_item.item_id} item_id not found")
+        
+        # Calculate the price of the items
+        price_query = "SELECT price FROM items WHERE id = %s"
+        cursor.execute(price_query, (order_item.item_id,))
+        price = cursor.fetchone()[0]
+        order_item_price = price * order_item.quantity
+
+        # Update the total price of the order
+        order_query = (
+            "UPDATE orders SET total_price = total_price + %s "
+            "WHERE id = %s"
+        )
+        order_values = (order_item_price, order_id)
+        cursor.execute(order_query, order_values)
+
+        item_query = (
+            "INSERT INTO order_item (order_id, item_id, quantity) "
+            "VALUES (%s, %s, %s)"
+        )
+        cursor.execute(item_query, (order_id, order_item.item_id, order_item.quantity))
+        
+        connection.commit()
+        return {"info": "Order item added", "order_id": order_id, "item_id": order_item.item_id}
+
+    except Exception as e:
+        connection.rollback()
+        return {"error": str(e)}
+    finally:
+        cursor.close()
+        connection.disconnect()
+        connection.close()
+
+
+def delete_order_item(order_id, order_item_id):
+    connection = mysql_connection()
+
+    connection.start_transaction()
+
+    cursor = connection.cursor(buffered=True)
+    try:
+        order_query = "SELECT id FROM orders WHERE id = %s"
+        cursor.execute(order_query, (order_id,))
+        if cursor.rowcount == 0:
+            raise Exception(f"{order_id} order_id not found")
+
+        item_query = "SELECT id FROM items WHERE id = %s"
+        cursor.execute(item_query, (order_item_id,))
+        if cursor.rowcount == 0:
+            raise Exception(f"{order_item_id} item_id not found")
+        
+        # Calculate the price of the items
+        price_query = "SELECT price FROM items WHERE id = %s"
+        cursor.execute(price_query, (order_item_id,))
+        price = cursor.fetchone()[0]
+
+        # Calculate the quantity of the items
+        quantity_query = "SELECT quantity FROM order_item WHERE order_id = %s AND item_id = %s"
+        cursor.execute(quantity_query, (order_id, order_item_id))
+        quantity = cursor.fetchone()[0]
+        order_item_price = price * quantity
+
+        # Update the total price of the order
+        order_query = (
+            "UPDATE orders SET total_price = total_price - %s "
+            "WHERE id = %s"
+        )
+        order_values = (order_item_price, order_id)
+        cursor.execute(order_query, order_values)
+
+        item_query = (
+            "DELETE FROM order_item WHERE order_id = %s AND item_id = %s"
+        )
+        cursor.execute(item_query, (order_id, order_item_id))
+        
+        connection.commit()
+        return {"info": "Order item deleted", "order_id": order_id, "item_id": order_item_id}
+
+    except Exception as e:
+        connection.rollback()
+        return {"error": str(e)}
+    finally:
+        cursor.close()
+        connection.disconnect()
+        connection.close()
