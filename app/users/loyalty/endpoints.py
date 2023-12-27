@@ -4,7 +4,7 @@ from app.JWT_auth.authorization import authorization_wrapper
 import app.users.loyalty.db as db
 from app.db_error_handler import handle_db_error
 import app.users.check as users_check
-from app.users.loyalty.model import LoyaltCreateModel
+from app.users.loyalty.model import LoyaltyCreateModel
 
 router = fastapi.APIRouter()
 
@@ -23,7 +23,7 @@ async def get_loyalty_by_id(id : int, user_identification : UserIdentification =
 
 @router.post("/cinematic/loyalty", tags=["loyalty"], status_code=201)
 @handle_db_error
-async def create_loyalty(loyalty_create_data : LoyaltCreateModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
+async def create_loyalty(loyalty_create_data : LoyaltyCreateModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     return {"data" : "Not implemented."}
 
 

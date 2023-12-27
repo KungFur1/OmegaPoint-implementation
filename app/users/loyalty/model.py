@@ -14,10 +14,10 @@ class LoyaltyModel(BaseModel):
     discount_percent : float
 
 
-class LoyaltCreateModel(BaseModel):
+class LoyaltyCreateModel(BaseModel):
     company_id: int = Field(default=None)
     created_by_id: int = Field(default=None)
-    
+
     name: constr(min_length=3, max_length=50)
     description: Optional[constr(max_length=200)]
 
