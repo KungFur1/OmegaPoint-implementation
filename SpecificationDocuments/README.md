@@ -51,9 +51,26 @@ Some endpoints have overlapping structure. Therefore, they will be structured to
 * `DELETE /cinematic/company` - Delete a company, only accessbile to system administrators only.
 
 ### Store endpoints
-*  `GET /cinematic/stores` - Get all stores.
+* `GET /cinematic/stores` - Get all stores.
 * `GET /cinematic/stores/{store_id}` - Get specific company.
 * `POST /cinematic/stores` - Create a store, only accesible to owners and managers.
 * `PUT /cinematic/stores/{store_id}` - Edit store details, only accesible to owners and managers.
 * `DELETE /cinematic/stores/{store_id}` - Delete a store, only accesible to owners and managers.
 
+### Items endpoints
+* `GET /cinematic/items` - Get all items, accessible by managers and employees, customers can access only specific data.
+* `GET /cinematic/items/{item_id}` - Get specific item, accessible by managers and employees, customers can access only specific data.
+* `POST /cinematic/items` - Create item, accessible by managers and employees, customers can access only specific data.
+* `PUT /cinematic/items/{item_id}` - Edit item details, accessible by managers and employees, customers can access only specific data.
+* `DELETE /cinematic/items/{item_id}`- Delete item, accessible by managers and employees, customers can access only specific data.
+
+* `GET /cinematic/items/{item_id}/discounts` - Get specific item discount, accessible by managers only.
+* `POST /cinematic/items/{item_id}/discounts` - Create specific item discount, accessible by managers only.
+* `PUT /cinematic/items/{item_id}/discounts` - Edit specific item discount, accessible by managers only.
+* `DELETE /cinematic/items/{item_id}/discounts` - Delete specific item discount, accessible by managers only.
+
+* `GET /cinematic/inventory` - Get all inventories, accessible by managers and employees only.
+* `GET /cinematic/inventory/{inventory_id}` - Get specific inventory, accessible by managers and employees only.
+* `POST /cinematic/inventory` - Create inventory, accessible by managers and employees only.
+* `PUT /cinematic/inventory/{inventory_id}` - Edit inventory details, accessible by managers and employees only.
+* `DELETE /cinematic/inventory/{inventory_id}` - Delete inventory, accessible by managers and employees only.
