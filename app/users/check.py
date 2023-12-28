@@ -6,6 +6,11 @@ import app.users.db as db
 def is_admin(user_id: int):
     if db.get_admin_information_by_id(user_id=user_id) is None:
         raise HTTPException(status_code=400, detail="is_admin CHECK: failed")
+    
+
+def belongs_to_company(user_company_data: UserCompanyDataModel):
+    if user_company_data is None:
+        raise HTTPException(status_code=400, detail="belongs_to_company CHECK: failed")
 
 
 def is_owner(user_company_data: UserCompanyDataModel):
