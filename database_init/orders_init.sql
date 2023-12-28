@@ -28,9 +28,12 @@ CREATE TABLE IF NOT EXISTS order_item (
   id INT AUTO_INCREMENT PRIMARY KEY,
   item_id INT NOT NULL,
   order_id INT NOT NULL,
+  assignee_id INT DEFAULT NULL,
   quantity INT NOT NULL,
+  status INT,
   FOREIGN KEY (order_id) REFERENCES orders(id),
-  FOREIGN KEY (item_id) REFERENCES items(id)
+  FOREIGN KEY (item_id) REFERENCES items(id),
+  FOREIGN KEY (assignee_id) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS discounts (

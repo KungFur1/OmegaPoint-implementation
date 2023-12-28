@@ -22,7 +22,6 @@ class OrderModel(BaseModel):
     status : OrderStatuses
 
 class OrderPostModel(BaseModel):
-    company_id : int
     assignee_id : Optional[int] = Field(default=None)
     products: List[int]
     quantities: List[int] 
@@ -33,7 +32,6 @@ class OrderPostModel(BaseModel):
         use_enum_values = True
         json_schema_extra = {
             "example": {
-                "company_id": 1,
                 "assignee_id": None,
                 "products": [1, 5],
                 "quantities": [5, 3], 
@@ -81,7 +79,7 @@ class DiscountModel(BaseModel):
         }
 
 
-class OrderItemModel(BaseModel):
+class AddOrderItemModel(BaseModel):
     item_id : int
     quantity : int
 
@@ -93,3 +91,23 @@ class OrderItemModel(BaseModel):
             }
         }
     
+
+class OrderItemModel(BaseModel):
+    id : int
+    order_id : int
+    item_id : int
+    asignee_id : Optional[int] = Field(default=None)
+    quantity : int
+    status : Optional[OrderStatuses] = Field(default=None)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "order_id": 1,
+                "item_id": 1,
+                "asignee_id": None,
+                "quantity": 5,
+                "status": None
+            }
+        }

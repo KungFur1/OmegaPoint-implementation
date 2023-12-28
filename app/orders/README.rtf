@@ -33,8 +33,13 @@
 \
 /cinematics/orders/\{order_id\}/deleteOrderItems (was was /cinematic/orders/\{order_id\}/orderItems/\{itemOrderId\}) DELETE - Employee/manager/owner can delete an existing order item from an order.\
 \
+/cinematic/orders/\{unassigned\}/orderItems (was /cinematic/itemOrders) GET - gets all of the assigned or unassigned order items of the company, depending on the bool value. Works for an employee and higher.\
 \
+/cinematic/orders/orderItems/\{order_item_id\} (was /cinematic/itemOrders/\{itemOrderId\}) GET - Gets one order item by ID. Works for an employee and higher.\
 \
+/cinematic/orders/orderItems/\{order_item_id\}/status (was /cinematic/itemOrders/\{itemOrderId\}/status) PUT - Updates the status of the order item. Works for an employee and higher.\
+\
+/cinematic/orders/orderitems/\{order_item_id\}/assign (was /cinemtic/itemrders/\{itemOrderId\}/assign) PUT - Updates the assignee of the order item. The user and the assignee have to work in the same company. \
 \
 \
 }
