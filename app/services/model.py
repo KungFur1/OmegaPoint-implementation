@@ -14,6 +14,15 @@ class ServicePostModel(BaseModel):
     name: str
     description: str
     price: float
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name" : "serviceName",
+                "description" : "Service description",
+                "price" : 10.88
+            }
+        }
     
 class ServiceUpdateModel(BaseModel):
     name: Optional[str] = Field(default = None)

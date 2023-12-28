@@ -34,6 +34,8 @@ import fastapi
 from app.users.endpoints import router as users_router
 from app.company.endpoints import router as company_router
 from app.users.roles.endpoints import router as roles_router
+from app.services.endpoints import router as services_router
+from app.appointments.endpoints import router as appointments_router
 
 app = fastapi.FastAPI()
 
@@ -41,6 +43,8 @@ app = fastapi.FastAPI()
 app.include_router(users_router)
 app.include_router(company_router)
 app.include_router(roles_router)
+app.include_router(services_router)
+app.include_router(appointments_router)
 
 from app.JWT_auth.authorization import authorization_wrapper, get_complete_user_information
 from app.JWT_auth.user_identification import UserIdentification, CompleteUserInformation

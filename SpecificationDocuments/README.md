@@ -51,16 +51,16 @@ Some endpoints have overlapping structure. Therefore, they will be structured to
 * `DELETE /cinematic/company` - Delete a company, only accessbile to system administrators only.
 
 ### Services endpoints
-* `GET /cinematic/services/{company_id}` - Get all company services.
-* `GET /cinematic/services/{company_id}/{service_id}` - Get a specific company service.
-* `POST /cinematic/services/` - Create a service.
+* `GET /cinematic/services` - Get all company services.
+* `GET /cinematic/services/{service_id}` - Get a specific company service.
+* `POST /cinematic/services` - Create a service.
 * `PUT /cinematic/services/{service_id}` - Edit a specific service.
 * `DELETE /cinematic/services/{service_id}` - Delete a specific service.
 * `POST /cinematic/services/{service_id}/discounts` - Create a service discount.
 
 ### Appointments endpoints
-* `GET /cinematic/appointments/{company_id}` - Get all company appointments.
-* `GET /cinematic/appointments/{company_id}/{appointment_id}` - Get a specific appointment.
+* `GET /cinematic/appointments` - Get all company appointments.
+* `GET /cinematic/appointments/{appointment_id}` - Get a specific appointment.
 * `POST /cinematic/appointments` - Create an appointment.
 * `PUT /cinematic/appointments` - Edit an appointment.
 * `DELETE /cinematic/appointments` - Delete an appointment.
