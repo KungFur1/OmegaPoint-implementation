@@ -34,7 +34,8 @@ import fastapi
 from app.users.endpoints import router as users_router
 from app.company.endpoints import router as company_router
 from app.users.roles.endpoints import router as roles_router
-from app.company.stores.endpoints import router as stores_router 
+from app.company.stores.endpoints import router as stores_router
+from app.users.loyalty.endpoints import router as loyalty_router
 from app.orders.endpoints import router as orders_router
 
 app = fastapi.FastAPI()
@@ -43,7 +44,8 @@ app = fastapi.FastAPI()
 app.include_router(users_router)
 app.include_router(company_router)
 app.include_router(roles_router)
-app.include_router(stores_router) 
+app.include_router(stores_router)
+app.include_router(loyalty_router)
 app.include_router(orders_router)
 
 from app.JWT_auth.authorization import authorization_wrapper, get_complete_user_information
@@ -52,7 +54,7 @@ from app.JWT_auth.user_identification import UserIdentification, CompleteUserInf
 @app.get("/test0", tags=["test"])
 async def test0(user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     logged_in_user_info = get_complete_user_information(user_identification.id)
-    return {"Hello" : logged_in_user_info.email}
+    return {"Hello" : logged_in_user_info}
 
 
 from app.db_error_handler import handle_db_error
