@@ -55,7 +55,7 @@ from app.JWT_auth.user_identification import UserIdentification, CompleteUserInf
 @app.get("/test0", tags=["test"])
 async def test0(user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     logged_in_user_info = get_complete_user_information(user_identification.id)
-    return {"Hello" : logged_in_user_info.email}
+    return {"Hello" : logged_in_user_info}
 
 
 from app.db_error_handler import handle_db_error
