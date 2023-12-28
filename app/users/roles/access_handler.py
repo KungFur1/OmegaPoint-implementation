@@ -19,7 +19,6 @@ class AccessModel(BaseModel):
     payments_manage: bool = Field(default=False)
 
 
-# Might throw mysql.connector.Error
 def get_user_access(user_id: int) -> AccessModel:
     # Check if user is owner or manager, they have access to everything
     user_company_data = users_db.get_user_company_data(user_id=user_id)

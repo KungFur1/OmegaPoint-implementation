@@ -1,4 +1,3 @@
-# Roles CRUD is only accessible to managers and owners of the company.
 import fastapi
 from app.JWT_auth.user_identification import UserIdentification
 from app.JWT_auth.authorization import authorization_wrapper
