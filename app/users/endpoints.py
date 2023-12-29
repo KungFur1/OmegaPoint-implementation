@@ -11,9 +11,9 @@ import app.company.check as company_check
 router = fastapi.APIRouter()
 
 
-# AUTHENTICATION START
+# Authentication endpoints:
 
-# Register a regular user
+
 @router.post("/cinematic/users/register", tags=["regular_users", "register"], status_code=201)
 @handle_db_error
 async def user_register(new_user : UserRegisterModel = fastapi.Body(default=None)):
@@ -22,14 +22,12 @@ async def user_register(new_user : UserRegisterModel = fastapi.Body(default=None
     return logreg.register(new_user)
 
 
-# Login for all users
 @router.post("/cinematic/users/login", tags=["regular_users", "login"], status_code=201)
 @handle_db_error
 async def user_login(login_data : UserLoginModel = fastapi.Body(default=None)):
     return logreg.login(login_data)
 
 
-# Register a company owner, done by the system administrators only
 @router.post("/cinematic/users/company/owner/register", tags=["company_users", "register", "owners"], status_code=201)
 @handle_db_error
 async def owner_register(new_owner : UserRegisterModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
@@ -41,7 +39,6 @@ async def owner_register(new_owner : UserRegisterModel = fastapi.Body(default=No
     return logreg.register(new_owner)
 
 
-# Register a company manager, done by the company owners only
 @router.post("/cinematic/users/company/manager/register", tags=["company_users", "register", "owners", "managers"], status_code=201)
 @handle_db_error
 async def manager_register(new_manager : UserRegisterModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
@@ -54,7 +51,6 @@ async def manager_register(new_manager : UserRegisterModel = fastapi.Body(defaul
     return logreg.register(new_manager)
 
 
-# Register a company employee, done by the company managers and company owners only
 @router.post("/cinematic/users/company/employee/register", tags=["company_users", "register", "owners", "managers", "employees"], status_code=201)
 @handle_db_error
 async def employee_register(new_employee : UserRegisterModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
@@ -67,17 +63,13 @@ async def employee_register(new_employee : UserRegisterModel = fastapi.Body(defa
     return logreg.register(new_employee)
 
 
-# AUTHENTICATION END
-
-
-
-# ENDPOINTS FOR COMPANY MANAGERS/OWNERS FOR MANAGING COMPANY USERS
+# Company user managment endpoints:
 # Look in to this after completing everything else:
 # For some reason roles [] doesnt update after assgning a role, I need to restart the server for it to update, very weird error, not sure why.
 # Maybe the sql query response is cached somewhere, but that seems weird.
 # Anyways I should move away from queries that merge few tables and instead merge them inside python.
 
-# Get all company users
+
 @router.get("/cinematic/users/company", tags=["company_users", "managers", "owners"], status_code=200)
 @handle_db_error
 async def get_all_company_users(user_identification = fastapi.Depends(authorization_wrapper)):
@@ -88,7 +80,6 @@ async def get_all_company_users(user_identification = fastapi.Depends(authorizat
     return {"data" : db.get_users_by_company(company_id=auth_user_cd.company_id)}
 
 
-# Get a specific user from the company 
 @router.get("/cinematic/users/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=200)
 @handle_db_error
 async def get_user_by_id(user_id: int, user_identification = fastapi.Depends(authorization_wrapper)):
@@ -101,7 +92,6 @@ async def get_user_by_id(user_id: int, user_identification = fastapi.Depends(aut
     return {"data" : db.get_company_user_by_id(user_id=user_id)}
 
 
-# Update company employee (EXCEPT Owner/Manager), Owner can update any user
 @router.put("/cinematic/users/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=200)
 @handle_db_error
 async def update_company_user(user_id: int, user_update_data : UserUpdateModel = fastapi.Body(default=None), user_identification = fastapi.Depends(authorization_wrapper)):
@@ -116,7 +106,6 @@ async def update_company_user(user_id: int, user_update_data : UserUpdateModel =
     return {"info" : "user updated successfully"}
 
 
-# Delete user, that was created by that company (EXCEPT Owner/Manager), Owner can delete any user
 @router.delete("/cinematic/users/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=204)
 @handle_db_error
 async def delete_company_user(user_id: int, user_identification = fastapi.Depends(authorization_wrapper)):
