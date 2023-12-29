@@ -34,9 +34,12 @@ import fastapi
 from app.users.endpoints import router as users_router
 from app.company.endpoints import router as company_router
 from app.users.roles.endpoints import router as roles_router
+from app.services.endpoints import router as services_router
+from app.appointments.endpoints import router as appointments_router
 from app.company.stores.endpoints import router as stores_router
 from app.users.loyalty.endpoints import router as loyalty_router
 from app.orders.endpoints import router as orders_router
+
 
 app = fastapi.FastAPI()
 
@@ -44,6 +47,8 @@ app = fastapi.FastAPI()
 app.include_router(users_router)
 app.include_router(company_router)
 app.include_router(roles_router)
+app.include_router(services_router)
+app.include_router(appointments_router)
 app.include_router(stores_router)
 app.include_router(loyalty_router)
 app.include_router(orders_router)
