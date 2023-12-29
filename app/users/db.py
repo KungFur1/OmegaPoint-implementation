@@ -3,7 +3,6 @@ from app.users.model import UserRegisterModel, CompanyPositions, UserAuthenticat
 from app.users.model import UserRegularDataModel, UserCompanyDataModel
 from typing import List, Optional
 
-
 connection = mysql_connection()
 
 

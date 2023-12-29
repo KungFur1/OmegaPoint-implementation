@@ -95,4 +95,3 @@ class RoleUpdateModel(BaseModel):
 class AssignedRole(BaseModel):
     user_id: int
     role_id: int
-

@@ -40,8 +40,11 @@ Some endpoints have overlapping structure. Therefore, they will be structured to
 * `GET /cinematic/roles/users/byrole/{role_id}` - Get all users with that role assigned.
 * `POST /cinematic/roles/users/{role_id}/{user_id}` - Assign a role.
 
-### Users loyalty endpoints
-* ...
+### Users loyalty endpoints [REDONE] -> Company loyalty endpoints (all company employees can read, only managers/owners can write)
+* `GET /cinematic/loyalty` - Get all company loyalty items.
+* `GET /cinematic/loyalty/{id}` - Get specific loyalty item.
+* `POST /cinematic/loyalty` - Add loyalty item.
+* `DELETE /cinematic/loyalty/{id}` - Delete loyalty item.
 
 ### Company endpoints
 * `GET /cinematic/company` - Get all companies, accessible to anyone.
