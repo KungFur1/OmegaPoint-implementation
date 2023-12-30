@@ -20,13 +20,9 @@ async def get_all_services(user_identification: UserIdentification = fastapi.Dep
 
 @router.get("/cinematic/services/{service_id}", tags=["services"], status_code=200)
 @handle_db_error
-async def get_service_details(service_id: int, user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
-    user_info = get_complete_user_information(user_identification.id)
+async def get_service_details(service_id: int):
+ 
     service = get_service_by_id(service_id)
-
-    if not service or service.company_id != user_info.company_id:
-        raise HTTPException(status_code=404, detail="Service not found or access denied")
-    
     return {"data": service}
 
 @router.post("/cinematic/services", tags= ["services"], status_code=201)

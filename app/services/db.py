@@ -8,9 +8,9 @@ connection = mysql_connection()
 
 
 def get_all_services_for_company(company_id: int) -> List[ServiceModel]:
-    query = "SELECT id, name, company_id, description, price, created_at FROM services WHERE company_id = %s"
+    query = "SELECT id, name, company_id, description, price, created_at FROM services"
     cursor = connection.cursor()
-    cursor.execute(query,(company_id,))
+    cursor.execute(query,)
     rows = cursor.fetchall()
     cursor.close()
     return [ServiceModel(id = row[0],name = row[1],company_id = row[2], description = row[3], price = row[4], created_at= row[5]) for row in rows]
