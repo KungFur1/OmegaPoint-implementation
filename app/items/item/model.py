@@ -5,6 +5,7 @@ from datetime import datetime
 
 class ItemModel(BaseModel):
     item_id: int = Field(default=None)
+    company_id: int
     name: str
     description: str
     price: float
@@ -12,6 +13,7 @@ class ItemModel(BaseModel):
 
 
 class ItemCreateModel(BaseModel):
+    company_id: int
     name: str
     description: str
     price: float
@@ -20,15 +22,17 @@ class ItemCreateModel(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "name": "Classic Facial",
-                "description": "A basic facial treatment",
-                "price": 50.0,
-                "tax_percentage": 5.0
+                "company_id": 1,
+                "name": "Item x",
+                "description": "Description x",
+                "price": 10,
+                "tax_percentage": 2
             }
         }
 
 
 class ItemUpdateModel(BaseModel):
+    company_id: Optional[int] = Field(default=None)
     name: Optional[str] = Field(default=None)
     description: Optional[str] = Field(default=None)
     price: Optional[float] = Field(default=None)
@@ -37,9 +41,10 @@ class ItemUpdateModel(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "name": "Updated Facial",
-                "description": "An updated facial treatment",
-                "price": 60.0,
-                "tax_percentage": 6.0
+                "company_id": 1,
+                "name": "Item x",
+                "description": "Description x",
+                "price": 10,
+                "tax_percentage": 2
             }
         }

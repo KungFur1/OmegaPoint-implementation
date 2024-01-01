@@ -2,27 +2,34 @@
 
 USE OmegaPoint;
 
-CREATE TABLE IF NOT EXISTS Items (
-    item_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-	description VARCHAR(255) NOT NULL,
-    price DOUBLE NOT NULL,
-    tax_percentage DOUBLE NOT NULL
+
+CREATE TABLE IF NOT EXISTS items (
+  item_id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  description VARCHAR(200),
+  price DECIMAL(10, 2) NOT NULL,
+  tax_percentage DECIMAL(10, 2) NOT NULL,
+  FOREIGN KEY (company_id) REFERENCES company(id)
 );
 
-INSERT INTO Items (name, description, price, tax_percentage) 
-VALUES 
-	('Classic Facial', 'A basic facial treatment', 50, 5),
-	('Gourmet Dinner', 'Exquisite gourmet dining experience', 100, 7),
-	('Massage Therapy', 'Relaxing full-body massage', 55.5, 3),
-	('Cocktail Mixology Class', 'Learn the art of crafting cocktails', 500, 8);
 
+INSERT INTO items (company_id, name, description, price, tax_percentage) VALUES
+  (1, 'Item 1', 'Description 1', 10.00, 2.00),
+  (1, 'Item 2', 'Description 2', 20.00, 3.00),
+  (1, 'Item 7', 'Description 7', 70.00, 2.00),
+  (1, 'Item 8', 'Description 8', 80.00, 4.00),
+  (1, 'Item 9', 'Description 9', 90.00, 2.00),
+  (1, 'Item 16', 'Description 16', 160.00, 1.00),
+  (1, 'Item 17', 'Description 17', 170.00, 3.00),
+  (1, 'Item 18', 'Description 18', 180.00, 2.00),
+  (1, 'Item 19', 'Description 19', 190.00, 2.00);
 
 CREATE TABLE IF NOT EXISTS ItemDiscounts (
     discount_id INT AUTO_INCREMENT PRIMARY KEY,
     item_id INT NOT NULL,
     discount_amount DECIMAL(5, 2) NOT NULL,
-    FOREIGN KEY (item_id) REFERENCES Items(item_id) ON DELETE CASCADE
+    FOREIGN KEY (item_id) REFERENCES items(item_id) ON DELETE CASCADE
 );
 
 INSERT INTO ItemDiscounts (item_id, discount_amount)
@@ -35,7 +42,7 @@ CREATE TABLE IF NOT EXISTS Inventory (
     item_id INT NOT NULL,
     store_id INT NOT NULL,
     quantity INT NOT NULL,
-    FOREIGN KEY (item_id) REFERENCES Items(item_id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id) REFERENCES items(item_id) ON DELETE CASCADE,
     FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
 );
 

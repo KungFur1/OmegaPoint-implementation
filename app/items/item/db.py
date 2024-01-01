@@ -6,8 +6,8 @@ connection = mysql_connection()
 
 
 def post_item(item: ItemCreateModel):
-    query = "INSERT INTO Items (name, description, price, tax_percentage) VALUES (%s, %s, %s, %s)"
-    values = (item.name, item.description, item.price, item.tax_percentage)
+    query = "INSERT INTO items (company_id, name, description, price, tax_percentage) VALUES (%s, %s, %s, %s, %s)"
+    values = (item.company_id, item.name, item.description, item.price, item.tax_percentage)
     cursor = connection.cursor()
     cursor.execute(query, values)
     connection.commit()
@@ -17,6 +17,9 @@ def post_item(item: ItemCreateModel):
 def put_item(item_id: int, item: ItemUpdateModel) -> bool:
     updates = []
     values = []
+    if item.company_id is not None:
+        updates.append("company_id = %s")
+        values.append(item.company_id)
     if item.name is not None:
         updates.append("name = %s")
         values.append(item.name)
@@ -31,7 +34,7 @@ def put_item(item_id: int, item: ItemUpdateModel) -> bool:
         values.append(item.tax_percentage)
     if not updates:
         return False
-    query = "UPDATE Items SET " + ", ".join(updates) + " WHERE item_id = %s"
+    query = "UPDATE items SET " + ", ".join(updates) + " WHERE item_id = %s"
     values.append(item_id)
     cursor = connection.cursor()
     cursor.execute(query, tuple(values))
@@ -42,7 +45,7 @@ def put_item(item_id: int, item: ItemUpdateModel) -> bool:
 
 
 def delete_item(item_id: int) -> bool:
-    query = "DELETE FROM Items WHERE item_id = %s"
+    query = "DELETE FROM items WHERE item_id = %s"
     values = (item_id,)
     cursor = connection.cursor()
     cursor.execute(query, values)
@@ -53,20 +56,20 @@ def delete_item(item_id: int) -> bool:
 
 
 def get_all_items() -> List[ItemModel]:
-    query = "SELECT item_id, name, description, price, tax_percentage FROM Items"
+    query = "SELECT item_id, company_id, name, description, price, tax_percentage FROM items"
     cursor = connection.cursor()
     cursor.execute(query)
     rows = cursor.fetchall()
     cursor.close()
     items = []
     for row in rows:
-        item = ItemModel(item_id=row[0], name=row[1], description=row[2], price=row[3], tax_percentage=row[4])
+        item = ItemModel(item_id=row[0], company_id=row[1], name=row[2], description=row[3], price=row[4], tax_percentage=row[5])
         items.append(item)
     return items
 
 
 def get_item_by_id(item_id: int) -> Optional[ItemModel]:
-    query = "SELECT item_id, name, description, price, tax_percentage FROM Items WHERE item_id = %s"
+    query = "SELECT item_id, company_id, name, description, price, tax_percentage FROM items WHERE item_id = %s"
     cursor = connection.cursor()
     cursor.execute(query, (item_id,))
     result = cursor.fetchone()
@@ -74,10 +77,11 @@ def get_item_by_id(item_id: int) -> Optional[ItemModel]:
     if result:
         result_dict = {
             "item_id": result[0],
-            "name": result[1],
-            "description": result[2],
-            "price": result[3],
-            "tax_percentage": result[4],
+            "company_id": result[1],
+            "name": result[2],
+            "description": result[3],
+            "price": result[4],
+            "tax_percentage": result[5]
         }
         return ItemModel(**result_dict)
     else:
