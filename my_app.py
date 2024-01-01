@@ -39,6 +39,9 @@ from app.appointments.endpoints import router as appointments_router
 from app.company.stores.endpoints import router as stores_router
 from app.users.loyalty.endpoints import router as loyalty_router
 from app.orders.endpoints import router as orders_router
+from app.items.item.endpoints import router as item_router 
+from app.items.discount.endpoints import router as discount_router 
+from app.items.inventory.endpoints import router as inventory_router
 
 
 app = fastapi.FastAPI()
@@ -52,6 +55,9 @@ app.include_router(appointments_router)
 app.include_router(stores_router)
 app.include_router(loyalty_router)
 app.include_router(orders_router)
+app.include_router(item_router) 
+app.include_router(discount_router) 
+app.include_router(inventory_router) 
 
 from app.JWT_auth.authorization import authorization_wrapper, get_complete_user_information
 from app.JWT_auth.user_identification import UserIdentification, CompleteUserInformation
