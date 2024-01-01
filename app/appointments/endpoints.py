@@ -12,8 +12,7 @@ router = fastapi.APIRouter()
 
 @router.get("/cinematic/appointments", tags=["appointments"], status_code = 200)
 @handle_db_error
-async def get_all_appointments(user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
-    company_id = get_complete_user_information(user_identification.id).company_id
+async def get_all_appointments(company_id: int):
     appointments = get_all_appointments_for_company(company_id)
     return {"data": appointments}
 

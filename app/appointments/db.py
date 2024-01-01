@@ -7,28 +7,28 @@ from app.appointments.model import AppointmentModel,AppointmentPostModel,Appoint
 connection = mysql_connection()
 
 def get_all_appointments_for_company(company_id: int) -> List[AppointmentModel]:
-    query = "SELECT id, name, company_id, user_id, appointment_date, price, created_at FROM appointments WHERE company_id = %s"
+    query = "SELECT id, service_id, company_id, user_id, appointment_date, price, created_at FROM appointments WHERE company_id = %s"
     cursor = connection.cursor()
     cursor.execute(query,(company_id,))
     rows = cursor.fetchall()
     cursor.close()
-    return [AppointmentModel(id = row[0], name = row[1],company_id = row[2], user_id= row[3], appointment_date = row[4], price = row[5], created_at= row[6]) for row in rows]
+    return [AppointmentModel(id = row[0], service_id = row[1],company_id = row[2], user_id= row[3], appointment_date = row[4], price = row[5], created_at= row[6]) for row in rows]
 
 def get_appointment_by_id(appointment_id: int) -> Optional[AppointmentModel]:
-    query = "SELECT id, name, company_id, user_id, appointment_date, price, created_at FROM appointments WHERE id = %s"
+    query = "SELECT id, service_id, company_id, user_id, appointment_date, price, created_at FROM appointments WHERE id = %s"
     cursor = connection.cursor()
     cursor.execute(query,(appointment_id,))
     row = cursor.fetchone()
     cursor.close()
-    return AppointmentModel(id = row[0], name = row[1],company_id = row[2], user_id= row[3], appointment_date = row[4], price = row[5], created_at=row [6]) if row else None
+    return AppointmentModel(id = row[0], service_id = row[1],company_id = row[2], user_id= row[3], appointment_date = row[4], price = row[5], created_at=row [6]) if row else None
 
 def create_appointment(appointment_data: AppointmentPostModel, company_id: int):
     try:
         connection = mysql_connection()
         cursor = connection.cursor()
 
-        query = "INSERT INTO appointments (company_id,name,user_id,appointment_date,price) VALUES (%s,%s,%s,%s, %s)"
-        values = (company_id, appointment_data.name, appointment_data.user_id, appointment_data.appointment_date, appointment_data.price)
+        query = "INSERT INTO appointments (company_id,service_id,user_id,appointment_date,price) VALUES (%s,%s,%s,%s, %s)"
+        values = (company_id, appointment_data.service_id, appointment_data.user_id, appointment_data.appointment_date, appointment_data.price)
         cursor.execute(query,values)
         connection.commit()
     except Exception as e:
@@ -42,9 +42,9 @@ def create_appointment(appointment_data: AppointmentPostModel, company_id: int):
 def update_appointment(appointment_id: int, appointment: AppointmentUpdateModel) -> bool:
     updates = []
     values = []
-    if appointment.name is not None:
-        updates.append("name = %s")
-        values.append(appointment.name)
+    if appointment.service_id is not None:
+        updates.append("service_id = %s")
+        values.append(appointment.service_id)
     if appointment.user_id is not None:
         updates.append("user_id = %s")
         values.append(appointment.user_id)
