@@ -14,7 +14,7 @@ import app.users.roles.check as check
 router = fastapi.APIRouter()
 
 
-@router.get("/cinematic/roles/company", tags=["users", "roles"], status_code=200)
+@router.get("/cinematic/roles/company", tags=["roles"], status_code=200)
 @handle_db_error
 async def get_roles_comp(user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
@@ -24,7 +24,7 @@ async def get_roles_comp(user_identification : UserIdentification = fastapi.Depe
     return {"data" : db.get_company_roles(company_id=auth_user_cd.company_id)}
 
 
-@router.get("/cinematic/roles/company/{role_id}", tags=["users", "roles"], status_code=200)
+@router.get("/cinematic/roles/company/{role_id}", tags=["roles"], status_code=200)
 @handle_db_error
 async def get_role_by_id(role_id: int, user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
@@ -36,7 +36,7 @@ async def get_role_by_id(role_id: int, user_identification : UserIdentification 
     return {"data" : role}
 
 
-@router.post("/cinematic/roles/company", tags=["users", "roles"], status_code=201)
+@router.post("/cinematic/roles/company", tags=["roles"], status_code=201)
 @handle_db_error
 async def upload_role(role_data : RoleCreateModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
@@ -49,7 +49,7 @@ async def upload_role(role_data : RoleCreateModel = fastapi.Body(default=None), 
     return {"info" : "role succesfully posted"}
 
 
-@router.put("/cinematic/roles/company/{role_id}", tags=["users", "roles"], status_code=200)
+@router.put("/cinematic/roles/company/{role_id}", tags=["roles"], status_code=200)
 @handle_db_error
 async def update_role(role_id: int, role_update_data : RoleUpdateModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
@@ -62,7 +62,7 @@ async def update_role(role_id: int, role_update_data : RoleUpdateModel = fastapi
     return {"info" : "role succesfully updated"}
 
 
-@router.delete("/cinematic/roles/company/{role_id}", tags=["users", "roles"], status_code=204)
+@router.delete("/cinematic/roles/company/{role_id}", tags=["roles"], status_code=204)
 @handle_db_error
 async def delete_role(role_id: int, user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
@@ -78,7 +78,7 @@ async def delete_role(role_id: int, user_identification : UserIdentification = f
 # Role assignment endpoints
 
 
-@router.get("/cinematic/roles/users/byuser/{user_id}", tags=["users", "roles"], status_code=200)
+@router.get("/cinematic/roles/users/byuser/{user_id}", tags=["roles"], status_code=200)
 @handle_db_error
 async def get_assigned_roles(user_id: int, user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
@@ -90,7 +90,7 @@ async def get_assigned_roles(user_id: int, user_identification : UserIdentificat
     return {"data" : db.get_assgined_roles_by_user_id(user_id=user_id)}
 
 
-@router.get("/cinematic/roles/users/byrole/{role_id}", tags=["users", "roles"], status_code=200)
+@router.get("/cinematic/roles/users/byrole/{role_id}", tags=["roles"], status_code=200)
 @handle_db_error
 async def get_users_with_role(role_id: int, user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
@@ -102,7 +102,7 @@ async def get_users_with_role(role_id: int, user_identification : UserIdentifica
     return {"data" : db.get_assgined_roles_by_role_id(role_id=role_id)}
 
 
-@router.post("/cinematic/roles/users/{role_id}/{user_id}", tags=["users", "roles"], status_code=201)
+@router.post("/cinematic/roles/users/{role_id}/{user_id}", tags=["roles"], status_code=201)
 @handle_db_error
 async def assign_role(role_id: int, user_id: int, user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)

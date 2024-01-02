@@ -14,7 +14,7 @@ router = fastapi.APIRouter()
 # Authentication endpoints:
 
 
-@router.post("/cinematic/users/register", tags=["regular_users", "register"], status_code=201)
+@router.post("/cinematic/users/register", tags=["users", "authentication"], status_code=201)
 @handle_db_error
 async def user_register(new_user : UserRegisterModel = fastapi.Body(default=None)):
     new_user.company_id = None
@@ -22,13 +22,13 @@ async def user_register(new_user : UserRegisterModel = fastapi.Body(default=None
     return logreg.register(new_user)
 
 
-@router.post("/cinematic/users/login", tags=["regular_users", "login"], status_code=201)
+@router.post("/cinematic/users/login", tags=["users", "authentication"], status_code=201)
 @handle_db_error
 async def user_login(login_data : UserLoginModel = fastapi.Body(default=None)):
     return logreg.login(login_data)
 
 
-@router.post("/cinematic/users/company/owner/register", tags=["company_users", "register", "owners"], status_code=201)
+@router.post("/cinematic/users/company/owner/register", tags=["users", "authentication"], status_code=201)
 @handle_db_error
 async def owner_register(new_owner : UserRegisterModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     check.is_admin(user_id=user_identification.id)
@@ -39,7 +39,7 @@ async def owner_register(new_owner : UserRegisterModel = fastapi.Body(default=No
     return logreg.register(new_owner)
 
 
-@router.post("/cinematic/users/company/manager/register", tags=["company_users", "register", "owners", "managers"], status_code=201)
+@router.post("/cinematic/users/company/manager/register", tags=["users", "authentication"], status_code=201)
 @handle_db_error
 async def manager_register(new_manager : UserRegisterModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = db.get_user_company_data(user_id=user_identification.id)
@@ -51,7 +51,7 @@ async def manager_register(new_manager : UserRegisterModel = fastapi.Body(defaul
     return logreg.register(new_manager)
 
 
-@router.post("/cinematic/users/company/employee/register", tags=["company_users", "register", "owners", "managers", "employees"], status_code=201)
+@router.post("/cinematic/users/company/employee/register", tags=["users", "authentication"], status_code=201)
 @handle_db_error
 async def employee_register(new_employee : UserRegisterModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = db.get_user_company_data(user_id=user_identification.id)
@@ -70,7 +70,7 @@ async def employee_register(new_employee : UserRegisterModel = fastapi.Body(defa
 # Anyways I should move away from queries that merge few tables and instead merge them inside python.
 
 
-@router.get("/cinematic/users/company", tags=["company_users", "managers", "owners"], status_code=200)
+@router.get("/cinematic/users/company", tags=["users"], status_code=200)
 @handle_db_error
 async def get_all_company_users(user_identification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = db.get_user_company_data(user_id=user_identification.id)
@@ -80,7 +80,7 @@ async def get_all_company_users(user_identification = fastapi.Depends(authorizat
     return {"data" : db.get_users_by_company(company_id=auth_user_cd.company_id)}
 
 
-@router.get("/cinematic/users/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=200)
+@router.get("/cinematic/users/company/{user_id}", tags=["users"], status_code=200)
 @handle_db_error
 async def get_user_by_id(user_id: int, user_identification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = db.get_user_company_data(user_id=user_identification.id)
@@ -92,7 +92,7 @@ async def get_user_by_id(user_id: int, user_identification = fastapi.Depends(aut
     return {"data" : db.get_company_user_by_id(user_id=user_id)}
 
 
-@router.put("/cinematic/users/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=200)
+@router.put("/cinematic/users/company/{user_id}", tags=["users"], status_code=200)
 @handle_db_error
 async def update_company_user(user_id: int, user_update_data : UserUpdateModel = fastapi.Body(default=None), user_identification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = db.get_user_company_data(user_id=user_identification.id)
@@ -106,7 +106,7 @@ async def update_company_user(user_id: int, user_update_data : UserUpdateModel =
     return {"info" : "user updated successfully"}
 
 
-@router.delete("/cinematic/users/company/{user_id}", tags=["company_users", "managers", "owners"], status_code=204)
+@router.delete("/cinematic/users/company/{user_id}", tags=["users"], status_code=204)
 @handle_db_error
 async def delete_company_user(user_id: int, user_identification = fastapi.Depends(authorization_wrapper)):
     auth_user_cd = db.get_user_company_data(user_id=user_identification.id)
