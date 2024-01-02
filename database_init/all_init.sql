@@ -1,3 +1,6 @@
+-- INITIALIZE ALL DB
+
+
 CREATE DATABASE IF NOT EXISTS OmegaPoint;
 USE OmegaPoint;
 
@@ -117,3 +120,176 @@ VALUES
 ((SELECT id FROM users WHERE email = 'employee2@example.com'), (SELECT id FROM roles WHERE name = 'Executor' AND company_id = (SELECT id FROM company WHERE name = 'Quantum Leap Enterprises')));
 
 
+-- LOYALTY
+
+
+CREATE TABLE IF NOT EXISTS loyalty (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    created_by_id INT NOT NULL,
+    `name` VARCHAR(50) NOT NULL,
+    `description` VARCHAR(200) DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    discount_percent FLOAT NOT NULL,
+    FOREIGN KEY (company_id) REFERENCES company(id) ON DELETE CASCADE
+    -- FOREIGN KEY (created_by_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+
+INSERT INTO loyalty (company_id, created_by_id, name, description, discount_percent) 
+VALUES 
+((SELECT id FROM company WHERE email = 'company1@example.com'), (SELECT id FROM users WHERE email = 'owner1@example.com'), 'Galactic Rewards', 'Exclusive rewards for our innovative customers', 10.0),
+((SELECT id FROM company WHERE email = 'company1@example.com'), (SELECT id FROM users WHERE email = 'manager1@example.com'), 'Innovation Club', 'Join our club of innovators and enjoy special benefits', 15.0),
+((SELECT id FROM company WHERE email = 'company2@example.com'), (SELECT id FROM users WHERE email = 'owner2@example.com'), 'Quantum Perks', 'Loyalty program for our esteemed clients', 12.0),
+((SELECT id FROM company WHERE email = 'company2@example.com'), (SELECT id FROM users WHERE email = 'manager2@example.com'), 'Leap Loyalty', 'A leap to savings and exclusive offers', 8.0);
+
+
+-- STORES
+
+
+CREATE TABLE IF NOT EXISTS stores (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES company(id) ON DELETE CASCADE,
+    UNIQUE KEY (company_id, name)
+);
+
+-- some sample stores for testing
+INSERT INTO stores (company_id, name, location) 
+VALUES 
+((SELECT id FROM company WHERE name = 'Galactic Innovations Inc.'), 'Main Street Store', '123 Main St'),
+((SELECT id FROM company WHERE name = 'Galactic Innovations Inc.'), 'Downtown Store', '456 Downtown Rd'),
+((SELECT id FROM company WHERE name = 'Quantum Leap Enterprises'), 'Uptown Store', '789 Uptown Ave'),
+((SELECT id FROM company WHERE name = 'Quantum Leap Enterprises'), 'Suburb Store', '101 Suburb Lane');
+
+
+-- ITEMS
+
+
+CREATE TABLE IF NOT EXISTS items (
+  item_id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  description VARCHAR(200),
+  price DECIMAL(10, 2) NOT NULL,
+  tax_percentage DECIMAL(10, 2) NOT NULL,
+  FOREIGN KEY (company_id) REFERENCES company(id)
+);
+
+
+INSERT INTO items (company_id, name, description, price, tax_percentage) VALUES
+  (1, 'Item 1', 'Description 1', 10.00, 2.00),
+  (1, 'Item 2', 'Description 2', 20.00, 3.00),
+  (1, 'Item 7', 'Description 7', 70.00, 2.00),
+  (1, 'Item 8', 'Description 8', 80.00, 4.00),
+  (1, 'Item 9', 'Description 9', 90.00, 2.00),
+  (1, 'Item 16', 'Description 16', 160.00, 1.00),
+  (1, 'Item 17', 'Description 17', 170.00, 3.00),
+  (1, 'Item 18', 'Description 18', 180.00, 2.00),
+  (1, 'Item 19', 'Description 19', 190.00, 2.00);
+
+CREATE TABLE IF NOT EXISTS ItemDiscounts (
+    discount_id INT AUTO_INCREMENT PRIMARY KEY,
+    item_id INT NOT NULL,
+    discount_amount DECIMAL(5, 2) NOT NULL,
+    FOREIGN KEY (item_id) REFERENCES items(item_id) ON DELETE CASCADE
+);
+
+INSERT INTO ItemDiscounts (item_id, discount_amount)
+VALUES
+	(1, 5.00),
+	(2, 10.00);
+
+CREATE TABLE IF NOT EXISTS Inventory (
+    inventory_id INT AUTO_INCREMENT PRIMARY KEY,
+    item_id INT NOT NULL,
+    store_id INT NOT NULL,
+    quantity INT NOT NULL,
+    FOREIGN KEY (item_id) REFERENCES items(item_id) ON DELETE CASCADE,
+    FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
+);
+
+INSERT INTO Inventory (item_id, store_id, quantity)
+VALUES
+    (1, 2, 100),
+    (2, 3, 50);
+
+
+-- ORDERS
+
+
+CREATE TABLE IF NOT EXISTS orders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  assignee_id INT DEFAULT NULL,
+  company_id INT NOT NULL,
+  total_price DECIMAL(10, 2) NOT NULL,
+  created_at DATETIME NOT NULL,
+  updated_at DATETIME,
+  status INT NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (company_id) REFERENCES company(id),
+  FOREIGN KEY (assignee_id) REFERENCES users(id)
+);
+
+
+CREATE TABLE IF NOT EXISTS order_item (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  item_id INT NOT NULL,
+  order_id INT NOT NULL,
+  assignee_id INT DEFAULT NULL,
+  quantity INT NOT NULL,
+  status INT,
+  FOREIGN KEY (order_id) REFERENCES orders(id),
+  FOREIGN KEY (item_id) REFERENCES items(item_id),
+  FOREIGN KEY (assignee_id) REFERENCES users(id)
+);
+
+
+-- SERVICES
+
+
+CREATE TABLE IF NOT EXISTS services (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    company_id INT NOT NULL,
+    description VARCHAR(200),
+    price DECIMAL(10,2) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES company(id) ON DELETE CASCADE
+);
+
+INSERT INTO services (company_id,name,description,price) VALUES
+(1,'Name1','Description 1', 10.00),
+(1,'Name2','Description 2', 100.00),
+(1,'Name3','Description 3', 15.50),
+(1,'Name4','Description 4', 9.99),
+(1,'Name5','Description 5', 16.54);
+
+
+-- APPOINTMENTS
+
+
+CREATE TABLE IF NOT EXISTS appointments(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    service_id INT NOT NULL,
+    company_id INT NOT NULL,
+    user_id INT NOT NULL,
+    appointment_date DATETIME NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (company_id) REFERENCES company(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+INSERT INTO appointments(service_id,company_id,user_id,appointment_date,price) VALUES
+(1,1,1,'2024-01-08 15:00:00',10.00),
+(1,1,1,'2024-01-09 16:30:00',100.00),
+(1,1,1,'2024-01-10 17:00:00',15.50),
+(1,1,1,'2024-01-11 10:15:00',9.99),
+(1,1,1,'2024-01-12 09:45:00',16.54);
