@@ -11,38 +11,28 @@ router = fastapi.APIRouter()
 
 @router.get("/cinematic/inventory", tags=["inventory"], status_code=200)
 @handle_db_error
-async def get_all_inventory():
+async def get_all_inventory(user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
     return {"data": inventory_db.get_all_inventory()}
-
 
 @router.get("/cinematic/inventory/{inventory_id}", tags=["inventory"], status_code=200)
 @handle_db_error
-async def get_inventory_by_id(inventory_id: str):
+async def get_inventory_by_id(inventory_id: str, user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
     return {"data": inventory_db.get_inventory_by_id(inventory_id=inventory_id)}
-
 
 @router.post("/cinematic/inventory", tags=["inventory"], status_code=201)
 @handle_db_error
-async def create_inventory(inventory_create_data: InventoryCreateModel = fastapi.Body(default=None),
-                            user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
-
-    inventory_db.post_inventory(inventory_create_data=inventory_create_data)
+async def create_inventory(inventory_create_data: InventoryCreateModel = fastapi.Body(default=None), user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
+    inventory_db.post_inventory(inventory_create_data)
     return {"info": "inventory successfully created"}
-
 
 @router.put("/cinematic/inventory/{inventory_id}", tags=["inventory"], status_code=200)
 @handle_db_error
-async def edit_inventory(inventory_id: str, inventory_update_data: InventoryUpdateModel = fastapi.Body(default=None),
-                           user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
-    
-    inventory_db.put_inventory(inventory_id=inventory_id, inventory_update_data=inventory_update_data)
+async def edit_inventory(inventory_id: str, inventory_update_data: InventoryUpdateModel = fastapi.Body(default=None), user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
+    inventory_db.put_inventory(inventory_id, inventory_update_data)
     return {"info": "inventory successfully updated"}
-
 
 @router.delete("/cinematic/inventory/{inventory_id}", tags=["inventory"], status_code=204)
 @handle_db_error
-async def delete_inventory(inventory_id: str,
-                            user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
-    
-    inventory_db.delete_inventory(inventory_id=inventory_id)
+async def delete_inventory(inventory_id: str, user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
+    inventory_db.delete_inventory(inventory_id)
     return {"info": "inventory successfully deleted"}
