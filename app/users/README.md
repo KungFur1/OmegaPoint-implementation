@@ -14,21 +14,21 @@ There are 3 types of users in the system:
 ```python
 class UserModel(BaseModel):
     # Authentication data
-    id : int = Field(default=None)
-    email : EmailStr = Field(default = None)
-    password : str = Field(default = None)
+    id : int
+    email : EmailStr
+    password : str
 
     # Company data, this is only relavant to the company users
     company_id : int = Field(default = None)
-    position : CompanyPositions = Field(default=CompanyPositions.EMPLOYEE)
+    position : CompanyPositions = Field(default=None)
     roles : List[int] = Field(default = None)
 
     # Extra information
-    created_at : datetime = Field(default=None)
-    phone_number : str = Field(default = None)
-    first_name : str = Field(default = None)
-    last_name : str = Field(default = None)
-    address : str = Field(default = None)
+    created_at : datetime
+    phone_number : str
+    first_name : str
+    last_name : str
+    address : str
 ```
 All 3 types of users have **authentication data** and **extra information**. Company users also have **company data**.
 
@@ -36,47 +36,69 @@ All 3 types of users have **authentication data** and **extra information**. Com
 ## Modules Overview
 
 ### `endpoints.py`
-This module defines the endpoints for user authentication and management.
 
-#### Authentication Endpoints
-- **User Registration** (`POST /cinematic/users/register`): Registers a regular user.
-- **User Login** (`POST /cinematic/users/login`): Authenticates any type of user and returns a JWT token.
-- **Owner Registration** (`POST /cinematic/users/company/owner/register`): Registers a company owner, restricted to system administrators.
-- **Manager Registration** (`POST /cinematic/users/company/manager/register`): Registers a company manager, restricted to company owners.
-- **Employee Registration** (`POST /cinematic/users/company/employee/register`): Registers a company employee, restricted to company owners and managers.
+This file defines the FastAPI endpoints for user operations. It includes endpoints for user registration, login, and company user registration (owner, manager, employee). It also contains endpoints for getting, updating, and deleting company users.
 
-#### Company User Management Endpoints
-- **Get All Company Users** (`GET /cinematic/users/company`): Retrieves all users associated with a company, accessible by managers and owners.
-- **Get Specific Company User** (`GET /cinematic/users/company/{user_id}`): Fetches details of a specific user within the company, accessible by managers and owners.
-- **Update Company User** (`PUT /cinematic/users/company/{user_id}`): Updates the details of a company user (excluding Owner/Manager). Owners have the privilege to update any user.
-- **Delete Company User** (`DELETE /cinematic/users/company/{user_id}`): Deletes a user created by the company (excluding Owner/Manager). Owners can delete any user.
+#### Key Endpoints
+
+- User Registration: `/cinematic/users/register`
+- User Login: `/cinematic/users/login`
+- Owner Registration: `/cinematic/users/company/owner/register`
+- Manager Registration: `/cinematic/users/company/manager/register`
+- Employee Registration: `/cinematic/users/company/employee/register`
+- Get All Company Users: `/cinematic/users/company`
+- Get User By ID: `/cinematic/users/company/{user_id}`
+- Update Company User: `/cinematic/users/company/{user_id}`
+- Delete Company User: `/cinematic/users/company/{user_id}`
 
 ### `db.py`
-Database operations related to users, all functions might throw `mysql.connector.Error`.
+
+Contains functions for interacting with the MySQL database. It includes functions to post new users, retrieve user information, update, and delete users.
 
 #### Functions
-- **post_user**: Inserts a new regular user into the database.
-- **get_user_authentication_data_by_email**: Retrieves authentication data for a user by email.
-- **get_admin_information_by_id**: Gets admin information by user ID.
-- **get_user_regular_data**: Retrieves regular user data.
-- **get_user_company_data**: Fetches company-related data for a user.
-- **post_company_user**: Inserts a new company user, ensuring transactional integrity.
 
-### `logreg.py`
-Handles the logic for user login and registration.
-
-#### Functions
-- **register**: Registers a new user, either regular or company user.
-- **login**: Authenticates a user and returns a JWT token if successful.
+- `post_user`: Insert a new user into the database.
+- `get_user_authentication_data_by_email`: Retrieve user authentication data by email.
+- `get_admin_information_by_id`: Get admin information by user ID.
+- `get_user_regular_data`: Retrieve regular user data.
+- `get_user_company_data`: Get company-specific user data.
+- `post_company_user`: Insert a new company user into the database.
+- `get_users_by_company`: Retrieve all users belonging to a specific company.
+- `get_company_user_by_id`: Get company user data by user ID.
+- `put_user`: Update a user's information.
+- `delete_user`: Delete a user from the database.
 
 ### `model.py`
-Defines the Pydantic models used in the system, including models for different user types and authentication data.
+
+Defines Pydantic models for user-related data structures. It includes models for user registration, login, complete user data, user update, and different types of user data models (regular, admin, company).
 
 #### Models
-- **UserModel**: Main model for user data used for incoming registration requests.
-- **UserLoginModel**: Model for login requests.
-- **UserAuthenticationDataModel**: Used in the process of login and is retrieved by email.
-- **AdminInformationModel**: Model for admin user data.
-- **UserCompanyDataModel**: Model for company user data.
-- **UserRegularDataModel**: Model for regular user data.
-- **CompanyPositions**: Enum for company user positions.
+
+- `CompanyPositions`: Enum for company positions (Employee, Manager, Owner).
+- `UserModel`: Main user model.
+- `UserRegisterModel`: Model for user registration.
+- `UserLoginModel`: Model for user login.
+- `CompleteUserDataModel`: Model for complete user data.
+- `UserUpdateModel`: Model for updating user information.
+- `UserAuthenticationDataModel`: Model for user authentication data.
+- `AdminDataModel`: Model for admin user data.
+- `UserCompanyDataModel`: Model for company user data.
+- `UserRegularDataModel`: Model for regular user data.
+
+### `logreg.py`
+
+Contains the logic for user registration and login. It uses functions from `db.py` to interact with the database and performs necessary checks before registering or logging in a user.
+
+### `check.py`
+
+Includes functions for various checks and validations related to user operations, such as verifying if a user is an admin, belongs to a specific company, or checking the relationship between users (like if a manager is trying to modify an employee's data).
+
+#### Key Functions
+
+- `is_admin`: Check if a user is an admin.
+- `belongs_to_company`: Verify if a user belongs to a company.
+- `is_owner`: Check if a user is a company owner.
+- `is_owner_or_manager`: Verify if a user is either a company owner or manager.
+- `users_are_same_company`: Check if two users belong to the same company.
+- `if_manager_then_employee`: Verify if a manager is modifying an employee's data.
+- `is_employee_or_higher`: Check if a user is an employee or has a higher position.

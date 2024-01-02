@@ -89,13 +89,3 @@ If you need, you can always define additional modules in your package. If your p
 
 ### Notes
 Don't forget to add your database initialization files to `database_init` folder. For more information about users and authorization refer to `users` and `JWT_auth` README.md files.
-
-## Every Component Overview
-
-### users
-
-### company
-
-### JWT_auth
-
-### db_connection.py
