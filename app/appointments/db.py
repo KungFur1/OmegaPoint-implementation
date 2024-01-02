@@ -22,22 +22,15 @@ def get_appointment_by_id(appointment_id: int) -> Optional[AppointmentModel]:
     cursor.close()
     return AppointmentModel(id = row[0], service_id = row[1],company_id = row[2], user_id= row[3], appointment_date = row[4], price = row[5], created_at=row [6]) if row else None
 
-def create_appointment(appointment_data: AppointmentPostModel, company_id: int):
-    try:
-        connection = mysql_connection()
-        cursor = connection.cursor()
+def create_appointment(appointment_data: AppointmentPostModel):
 
-        query = "INSERT INTO appointments (company_id,service_id,user_id,appointment_date,price) VALUES (%s,%s,%s,%s, %s)"
-        values = (company_id, appointment_data.service_id, appointment_data.user_id, appointment_data.appointment_date, appointment_data.price)
+        query = "INSERT INTO appointments (service_id,company_id,user_id,appointment_date,price) VALUES (%s,%s,%s,%s, %s)"
+        values = (appointment_data.service_id, appointment_data.company_id, appointment_data.user_id, appointment_data.appointment_date, appointment_data.price)
+        cursor = connection.cursor()
         cursor.execute(query,values)
         connection.commit()
-    except Exception as e:
-        print(f"Database Error: {e}")
-        raise HTTPException(status_code=500, detail = f"Database Error: {str(e)}")
-    finally:
         cursor.close()
-        if connection.is_connected():
-            connection.close()
+
 
 def update_appointment(appointment_id: int, appointment: AppointmentUpdateModel) -> bool:
     updates = []

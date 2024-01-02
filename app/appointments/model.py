@@ -13,6 +13,7 @@ class AppointmentModel(BaseModel):
 
 class AppointmentPostModel(BaseModel):
     service_id: int
+    company_id: int
     user_id: int
     appointment_date: datetime
     price: float

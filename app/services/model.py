@@ -13,6 +13,7 @@ class ServiceModel(BaseModel):
 
 class ServicePostModel(BaseModel):
     name: str
+    company_id: int
     description: str
     price: float
     time: int
@@ -21,6 +22,7 @@ class ServicePostModel(BaseModel):
         json_schema_extra = {
             "example": {
                 "name" : "serviceName",
+                "company_id" : "1",
                 "description" : "Service description",
                 "price" : 10.88,
                 "time" : 20

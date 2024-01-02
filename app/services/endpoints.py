@@ -29,57 +29,35 @@ async def get_service_details(service_id: int):
 @router.post("/cinematic/services", tags= ["services"], status_code=201)
 @handle_db_error
 async def create_service_endpoint(service_data: ServicePostModel = Body(...), user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
-    user_info = get_complete_user_information(user_identification.id)
+        
+        db.create_service(service_data)
+        return {"info": "Service successfully created"}
 
-    users_check.is_owner_or_manager(user_info)
-    
-    try:
-        service_id = create_service(service_data, user_info.company_id)
-        return {"info": "Service successfully created", "service_id": service_id}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail= f"Error creating service: {e}")
     
 @router.put("/cinematic/services/{service_id}",tags=["services"], status_code=200)
 @handle_db_error
 async def update_service_details(service_id: int, service_data: ServiceUpdateModel= fastapi.Body(default=None), user_identification: UserIdentification =fastapi.Depends(authorization_wrapper)):
-    user_info = get_complete_user_information(user_identification.id)
-    service = check.service_exist(service_id)
-    
-    users_check.is_owner_or_manager(user_info)
-    if service.company_id != user_info.company_id:
-        raise HTTPException(status_code=403, detail="Access denied")
-    
-    updated= update_service(service_id, service_data)
-    if not updated:
-        raise HTTPException(status_code=400,detail= "No updates performed")
-    return {"info": "Service 0successfully updated"}
+
+    db.update_service(service_id,service_data)
+    return {"info": "Service successfully updated"}
 
 @router.delete("/cinematic/services/{service_id}", tags = ["services"], status_code=204)
 @handle_db_error
 async def delete_service_endpoint(service_id: int, user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
-    user_info = get_complete_user_information(user_identification.id)
-    service = check.service_exist(service_id)
 
-    users_check.is_owner_or_manager(user_info)
-    if service.company_id != user_info.company_id:
-        raise HTTPException(status_code=403, detail="Access denied: Cannot delete services of other companies")
-    
-    deleted = delete_service(service_id)
-    if not deleted:
-        raise HTTPException(status_code=404, detail="Unable to delete service")
+    db.delete_service(service_id)
     return {"info": "Service successfully deleted"}
 
 
 @router.get("/cinematic/services/serviceAvailability/{service_id}", tags=["services"], status_code=200)
 @handle_db_error
-async def get_s(service_id: int):
+async def get_service_availability(service_id: int):
  
-    service = get_service_availability(service_id)
-    return {"data": service}
+  return {"data" : db.get_service_availability(service_id=service_id)}
 
 @router.post("/cinematic/services/serviceAvailability/{service_id}", tags= ["services"], status_code=201)
 @handle_db_error
-async def create_serviceAvailability_time(service_availability_data: ServiceAvailabilityModel = fastapi.Body(default=None), user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
+async def create_service_Availability_time(service_availability_data: ServiceAvailabilityModel = fastapi.Body(default=None), user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
     db.create_service_availability(service_availability_data)
     return {"info": "Working time successfully created"}
 
