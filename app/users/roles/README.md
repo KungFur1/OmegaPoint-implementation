@@ -40,9 +40,3 @@ Includes various checks and validations such as:
 
 - **role_is_same_company**: Ensures a role belongs to the same company as the user.
 - **role_is_not_assigned**: Checks if a role is already assigned to a user.
-
-## Usage
-The roles module is integrated into the broader POS system and interacts with other modules such as user management. It utilizes FastAPI for endpoint definitions, Pydantic for data validation, and `mysql.connector` for database interactions.
-
-## Error Handling
-Errors in the database operations are handled outside the `db.py` functions, ensuring a clear separation of concerns.
