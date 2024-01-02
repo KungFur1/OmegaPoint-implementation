@@ -85,5 +85,13 @@ def get_service_availability(service_id: int) -> Optional[ServiceAvailabilityMod
     cursor.close()
     return ServiceAvailabilityModel(id = row[0], service_id = row[1],start_date = row[2], end_date= row [3]) if row else None
 
+def create_service_availability(service_data: ServiceAvailabilityModel):
+    
+        query = "INSERT INTO service_availability (service_id,start_date,end_date) VALUES (%s,%s,%s)"
+        values = (service_data.service_id, service_data.start_date,service_data.end_date)
+        cursor = connection.cursor()
+        cursor.execute(query,values)
+        connection.commit()
+        cursor.close()
 
     

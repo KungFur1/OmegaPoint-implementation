@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Body
 import fastapi
 from app.services.model import ServiceModel,ServicePostModel,ServiceUpdateModel, ServiceAvailabilityModel
-from app.services.db import get_all_services_for_company,get_service_by_id, create_service,update_service,delete_service, get_service_availability
+from app.services.db import get_all_services_for_company,get_service_by_id, create_service,update_service,delete_service, get_service_availability, create_service_availability
 from app.JWT_auth.authorization import authorization_wrapper, get_complete_user_information
 from app.JWT_auth.user_identification import UserIdentification
 from app.db_error_handler import handle_db_error
@@ -32,7 +32,7 @@ async def create_service_endpoint(service_data: ServicePostModel = Body(...), us
     user_info = get_complete_user_information(user_identification.id)
 
     users_check.is_owner_or_manager(user_info)
-
+    
     try:
         service_id = create_service(service_data, user_info.company_id)
         return {"info": "Service successfully created", "service_id": service_id}
@@ -77,4 +77,9 @@ async def get_s(service_id: int):
     service = get_service_availability(service_id)
     return {"data": service}
 
+@router.post("/cinematic/services/serviceAvailability/{service_id}", tags= ["services"], status_code=201)
+@handle_db_error
+async def create_serviceAvailability_time(service_availability_data: ServiceAvailabilityModel = fastapi.Body(default=None), user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
+    db.create_service_availability(service_availability_data)
+    return {"info": "Working time successfully created"}
 
