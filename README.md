@@ -1,6 +1,3 @@
-# Tests
-https://www.postman.com/payload-saganist-23327525/workspace/omegapoint-tests-workspace/collection/32090015-f5b042e7-71ae-42db-8139-bb579fa5df61?action=share&creator=32090015
-
 # OmegaPoint-implementation
 OmegaPoint-implementation is a point of sale system for HoReCa and beauty secotrs.
 
@@ -29,14 +26,16 @@ This is a group project for university. The task is to implement a system based 
 In this folder you will find the OmegaPoint system specification document, our system's architecture and endpoints are based on this document. However we made quite significant changes to the endpoints and some minor changes to the functionality due to errors in the specification. These changes will be reflected in the `SpecificationDocuments` folder as well.
 
 ### app
-The logic behind OmegaPoint. This is where all scripts are. Inside you will find a folder for every component:
+The logic behind OmegaPoint. This is where all scripts are. Inside you will find all project`s components:
 * users
 * company
 * services
+* appointments
 * items
 * orders
 * payments
 * db_connection
+* db_error_handler
 * JWT_auth
 
 ### database_init
@@ -50,3 +49,9 @@ The main script, you should run this script when starting the project. Mainly it
 
 ### requirements.txt
 System's dependencies are defined here. This file is also used to install the dependecies with terminal command: `pip install -r requirements.txt`.
+
+### stack.yaml
+Alternative way to setup the database.
+
+## Tests
+The goal is to write a basic (standard scenario) status code check for each endpoint. And some additional edge case tests. Testing is done using **postman**, this is a link to the postman workspace [Tests](https://www.postman.com/payload-saganist-23327525/workspace/omegapoint-tests-workspace/collection/32090015-f5b042e7-71ae-42db-8139-bb579fa5df61?action=share&creator=32090015).
