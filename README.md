@@ -1,3 +1,6 @@
+# Tests
+https://www.postman.com/payload-saganist-23327525/workspace/omegapoint-tests-workspace/collection/32090015-f5b042e7-71ae-42db-8139-bb579fa5df61?action=share&creator=32090015
+
 # OmegaPoint-implementation
 OmegaPoint-implementation is a point of sale system for HoReCa and beauty secotrs.
 
