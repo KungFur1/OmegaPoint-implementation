@@ -1,45 +1,55 @@
-# Company Documentation
+# Company Package Documentation
 
-The Company module is part of a FastAPI application, responsible for managing company-related data and operations. It includes endpoints for CRUD operations on companies and related database interaction logic.
+Company package manages all **company** & **stores** CRUD operations.
 
-## Files Overview
+## Modules Overview
 
 ### `endpoints.py`
 
-This file defines the API endpoints for company-related operations. It includes routes for:
+1. **Get All Companies**
+   - **Endpoint**: `/cinematic/company`
+   - **Method**: GET
+   - **Status Code**: 200 (OK)
+   - **Description**: Retrieves information about all companies in the system. This endpoint is unauthorize, which means anyone can access it.
 
-- Retrieving all companies
-- Retrieving a specific company by ID
-- Creating a new company
-- Updating an existing company
-- Deleting a company
+2. **Get Company by ID**
+   - **Endpoint**: `/cinematic/company/{company_id}`
+   - **Method**: GET
+   - **Status Code**: 200 (OK)
+   - **Description**: Retrieves information about a specific company by its ID. This endpoint is unauthorize, which means anyone can access it.
 
-Authorization checks are performed where necessary, using JWT and user identification.
+3. **Create Company**
+   - **Endpoint**: `/cinematic/company`
+   - **Method**: POST
+   - **Status Code**: 201 (Created)
+   - **Description**: Creates a new company in the system. Restricted to admin users.
+
+4. **Edit Company**
+   - **Endpoint**: `/cinematic/company`
+   - **Method**: PUT
+   - **Status Code**: 201 (Created)
+   - **Description**: Updates the information of the company associated with the authenticated owner.
+
+5. **Delete Company**
+   - **Endpoint**: `/cinematic/company`
+   - **Method**: DELETE
+   - **Status Code**: 204 (No Content)
+   - **Description**: Deletes the company associated with the authenticated owner.
+
 
 ### `db.py`
-
-Contains functions to interact with the MySQL database. It includes:
-
 - `post_company`: Inserts a new company record.
 - `put_company`: Updates an existing company record.
 - `delete_company`: Deletes a company record.
 - `get_all_companies`: Retrieves all company records.
 - `get_company_by_id`: Retrieves a specific company record by ID.
 
-These functions use `mysql.connector` for database operations.
 
 ### `model.py`
-
-Defines Pydantic models for company data. It includes:
-
 - `CompanyModel`: Model representing a company record.
 - `CompanyCreateModel`: Model for creating a new company.
 - `CompanyUpdateModel`: Model for updating an existing company.
 
-Each model includes fields like `id`, `email`, `name`, and `created_at`.
 
 ### `check.py`
-
-Contains utility functions for company data validation. It includes:
-
 - `company_exists`: Checks if a company exists in the database.
