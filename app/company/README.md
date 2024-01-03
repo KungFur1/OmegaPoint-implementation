@@ -1,6 +1,6 @@
 # Company Package Documentation
 
-Company package manages all company, stores CRUD operations.
+Company package manages all **company** & **stores** CRUD operations.
 
 ## Modules Overview
 
