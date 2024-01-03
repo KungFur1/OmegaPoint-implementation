@@ -50,7 +50,7 @@ The main script, you should run this script when starting the project. Mainly it
 ### requirements.txt
 System's dependencies are defined here. This file is also used to install the dependecies with terminal command: `pip install -r requirements.txt`.
 
-### stack.yaml
+### stack.yml
 Alternative way to setup the database.
 
 ## Tests
