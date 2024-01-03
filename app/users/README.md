@@ -37,26 +37,69 @@ All 3 types of users have **authentication data** and **extra information**. Com
 
 ### `endpoints.py`
 
-#### Key Endpoints
+#### Authentication Endpoints
 
-##### Authentication endpoints:
-- User Registration: `/cinematic/users/register`
-- User Login: `/cinematic/users/login`
-- Owner Registration: `/cinematic/users/company/owner/register`
-- Manager Registration: `/cinematic/users/company/manager/register`
-- Employee Registration: `/cinematic/users/company/employee/register`
-##### Company user management endpoints (only accessible to managers/owners):
-- Get All Company Users: `/cinematic/users/company`
-- Get User By ID: `/cinematic/users/company/{user_id}`
-- Update Company User: `/cinematic/users/company/{user_id}`
-- Delete Company User: `/cinematic/users/company/{user_id}`
+1. **User Registration**
+   - **Endpoint**: `/cinematic/users/register`
+   - **Method**: POST
+   - **Status Code**: 201 (Created)
+   - **Description**: Registers a new user in the system.
+
+2. **User Login**
+   - **Endpoint**: `/cinematic/users/login`
+   - **Method**: POST
+   - **Status Code**: 201 (Created)
+   - **Description**: Authenticates a user and provides a JWT token.
+
+3. **Owner Registration**
+   - **Endpoint**: `/cinematic/users/company/owner/register`
+   - **Method**: POST
+   - **Status Code**: 201 (Created)
+   - **Description**: Registers a new owner for a company. Requires admin privileges.
+
+4. **Manager Registration**
+   - **Endpoint**: `/cinematic/users/company/manager/register`
+   - **Method**: POST
+   - **Status Code**: 201 (Created)
+   - **Description**: Registers a new manager for the authenticated user's company.
+
+5. **Employee Registration**
+   - **Endpoint**: `/cinematic/users/company/employee/register`
+   - **Method**: POST
+   - **Status Code**: 201 (Created)
+   - **Description**: Registers a new employee for the authenticated user's company.
+
+#### Company User Management Endpoints
+
+1. **Get All Company Users**
+   - **Endpoint**: `/cinematic/users/company`
+   - **Method**: GET
+   - **Status Code**: 200 (OK)
+   - **Description**: Retrieves all users associated with the company of the authenticated user.
+
+2. **Get Company User by ID**
+   - **Endpoint**: `/cinematic/users/company/{user_id}`
+   - **Method**: GET
+   - **Status Code**: 200 (OK)
+   - **Description**: Retrieves a specific company user by their ID.
+
+3. **Update Company User**
+   - **Endpoint**: `/cinematic/users/company/{user_id}`
+   - **Method**: PUT
+   - **Status Code**: 200 (OK)
+   - **Description**: Updates the details of a company user.
+
+4. **Delete Company User**
+   - **Endpoint**: `/cinematic/users/company/{user_id}`
+   - **Method**: DELETE
+   - **Status Code**: 204 (No Content)
+   - **Description**: Deletes a company user from the system.
+
 
 ### `db.py`
-
 Database functions, all functions should be as minimal as possible and only do the sql operation no other logic.
 
 #### Functions
-
 - `post_user`: Insert a new regular user into the database.
 - `get_user_authentication_data_by_email`: Retrieve user authentication data by email.
 - `get_admin_information_by_id`: Get admin information by user ID.
@@ -68,10 +111,10 @@ Database functions, all functions should be as minimal as possible and only do t
 - `put_user`: Update a user's information.
 - `delete_user`: Delete a user from the database.
 
+
 ### `model.py`
 
 #### Models
-
 - `CompanyPositions`: Enum for company positions (Employee, Manager, Owner).
 - `UserModel`: Main user model.
 - `UserRegisterModel`: Model for user registration.
@@ -83,12 +126,12 @@ Database functions, all functions should be as minimal as possible and only do t
 - `UserCompanyDataModel`: Model for company user data.
 - `UserRegularDataModel`: Model for regular user data.
 
-### `logreg.py`
 
+### `logreg.py`
 Contains the logic for user registration and login.
 
-### `check.py`
 
+### `check.py`
 Includes functions for various checks and validations related to user operations, such as verifying if a user is an admin, belongs to a specific company, or checking the relationship between users (like if a manager is trying to modify an employee's data).
 
 #### Key Functions
