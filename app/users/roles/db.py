@@ -117,7 +117,7 @@ def get_role_by_id(role_id: int) -> Optional[RoleModel]:
     return None
 
 
-def put_role(role: RoleUpdateModel):
+def put_role(role: RoleUpdateModel, role_id: int):
     query = "UPDATE roles SET "
     data = []
     fields = [
@@ -143,7 +143,7 @@ def put_role(role: RoleUpdateModel):
 
     query += ", ".join(update_fields)
     query += " WHERE id = %s"
-    data.append(role.id)
+    data.append(role_id)
 
     cursor = connection.cursor()
     cursor.execute(query, tuple(data))
