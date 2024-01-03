@@ -37,15 +37,15 @@ All 3 types of users have **authentication data** and **extra information**. Com
 
 ### `endpoints.py`
 
-This file defines the FastAPI endpoints for user operations. It includes endpoints for user registration, login, and company user registration (owner, manager, employee). It also contains endpoints for getting, updating, and deleting company users.
-
 #### Key Endpoints
 
+##### Authentication endpoints:
 - User Registration: `/cinematic/users/register`
 - User Login: `/cinematic/users/login`
 - Owner Registration: `/cinematic/users/company/owner/register`
 - Manager Registration: `/cinematic/users/company/manager/register`
 - Employee Registration: `/cinematic/users/company/employee/register`
+##### Company user management endpoints (only accessible to managers/owners):
 - Get All Company Users: `/cinematic/users/company`
 - Get User By ID: `/cinematic/users/company/{user_id}`
 - Update Company User: `/cinematic/users/company/{user_id}`
@@ -53,15 +53,15 @@ This file defines the FastAPI endpoints for user operations. It includes endpoin
 
 ### `db.py`
 
-Contains functions for interacting with the MySQL database. It includes functions to post new users, retrieve user information, update, and delete users.
+Database functions, all functions should be as minimal as possible and only do the sql operation no other logic.
 
 #### Functions
 
-- `post_user`: Insert a new user into the database.
+- `post_user`: Insert a new regular user into the database.
 - `get_user_authentication_data_by_email`: Retrieve user authentication data by email.
 - `get_admin_information_by_id`: Get admin information by user ID.
 - `get_user_regular_data`: Retrieve regular user data.
-- `get_user_company_data`: Get company-specific user data.
+- `get_user_company_data`: Get company user data.
 - `post_company_user`: Insert a new company user into the database.
 - `get_users_by_company`: Retrieve all users belonging to a specific company.
 - `get_company_user_by_id`: Get company user data by user ID.
@@ -69,8 +69,6 @@ Contains functions for interacting with the MySQL database. It includes function
 - `delete_user`: Delete a user from the database.
 
 ### `model.py`
-
-Defines Pydantic models for user-related data structures. It includes models for user registration, login, complete user data, user update, and different types of user data models (regular, admin, company).
 
 #### Models
 
@@ -87,7 +85,7 @@ Defines Pydantic models for user-related data structures. It includes models for
 
 ### `logreg.py`
 
-Contains the logic for user registration and login. It uses functions from `db.py` to interact with the database and performs necessary checks before registering or logging in a user.
+Contains the logic for user registration and login.
 
 ### `check.py`
 
