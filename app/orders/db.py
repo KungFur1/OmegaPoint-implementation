@@ -575,9 +575,6 @@ def assign_order_item(order_item_id: int, assignee_id: int, user_id: int):
     order_values = (assignee_id, order_item_id)
     cursor.execute(order_query, order_values)
 
-    if cursor.rowcount == 0:
-        raise Exception(f"{order_item_id} order_item_id not found")
-
     connection.commit()
     cursor.close()
     connection.disconnect()
