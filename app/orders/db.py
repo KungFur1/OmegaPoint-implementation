@@ -590,8 +590,6 @@ def is_order_in_company(order_id: int, user_id: int):
     cursor = connection.cursor(buffered=True)
     order_query = "SELECT id FROM orders WHERE id = %s AND company_id = %s"
     cursor.execute(order_query, (order_id, company_id))
-    if cursor.rowcount == 0:
-        raise HTTPException(status_code=404, detail=f"{order_id} order_id not found")
 
     connection.close()
     cursor.close()
