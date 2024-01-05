@@ -58,34 +58,3 @@ app.include_router(orders_router)
 app.include_router(item_router) 
 app.include_router(discount_router) 
 app.include_router(inventory_router) 
-
-from app.JWT_auth.authorization import authorization_wrapper, get_complete_user_information
-from app.JWT_auth.user_identification import UserIdentification, CompleteUserInformation
-
-@app.get("/test0", tags=["test"])
-async def test0(user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
-    logged_in_user_info = get_complete_user_information(user_identification.id)
-    return {"Hello" : logged_in_user_info}
-
-
-from app.db_error_handler import handle_db_error
-from mysql.connector import Error as DBError123
-from app.users.model import UserLoginModel
-
-
-@app.post("/test1/{number}", tags=["test"])
-@handle_db_error
-async def test1(number:int, login_data : UserLoginModel = fastapi.Body(default=None), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
-    logged_in_user_info = get_complete_user_information(user_identification.id)
-    print(logged_in_user_info.email)
-    print(number)
-    print(login_data)
-
-    raise DBError123
-
-import app.users.db as users_db
-
-@app.post("/test2", tags=["test"])
-@handle_db_error
-async def test2():
-    return users_db.get_users_by_company(1)

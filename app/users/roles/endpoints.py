@@ -58,7 +58,7 @@ async def update_role(role_id: int, role_update_data : RoleUpdateModel = fastapi
     users_check.is_owner_or_manager(auth_user_cd)
     check.role_is_same_company(role=role, user_company_data=auth_user_cd)
 
-    db.put_role(role_update_data)
+    db.put_role(role_update_data, role_id=role_id)
     return {"info" : "role succesfully updated"}
 
 
