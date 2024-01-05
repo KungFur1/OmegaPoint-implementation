@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS appointments(
     appointment_date DATETIME NOT NULL,
     price DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (company_id) REFERENCES company(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Body
 import fastapi
 from app.appointments.model import AppointmentModel, AppointmentPostModel, AppointmentUpdateModel
 from app.appointments.db import get_all_appointments_for_company, get_appointment_by_id, create_appointment, update_appointment, delete_appointment
+from app.services.db import get_service_by_id, get_service_availability
+from app.services.model import ServiceAvailabilityModel,ServiceModel
 from app.JWT_auth.authorization import authorization_wrapper, get_complete_user_information
 from app.JWT_auth.user_identification import UserIdentification
 from app.db_error_handler import handle_db_error
@@ -26,7 +28,16 @@ async def get_appointment_details(appointment_id: int, user_identification: User
 
 @router.post("/cinematic/appointments", tags= ["appointments"], status_code=201)
 @handle_db_error
-async def create_appointment_endpoint(appointment_data: AppointmentPostModel = Body(...), user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
+async def create_appointment_endpoint(appointment_data: AppointmentPostModel = Body(...),user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
+
+    service = get_service_by_id(appointment_data.service_id)
+    workingTime = service.time
+    
+
+        
+    
+    
+    print(workingTime)
 
     db.create_appointment(appointment_data)
 

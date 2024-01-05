@@ -276,7 +276,7 @@ CREATE TABLE IF NOT EXISTS service_availability (
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
     FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
-)
+);
 
 INSERT INTO service_availability (service_id,start_date,end_date) VALUES
 (1,'2024-01-08 08:00:00', '2024-01-08 16:00:00'),
