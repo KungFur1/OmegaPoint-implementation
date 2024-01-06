@@ -28,11 +28,11 @@ INSERT INTO items (company_id, name, description, price, tax_percentage) VALUES
 CREATE TABLE IF NOT EXISTS ItemDiscounts (
     discount_id INT AUTO_INCREMENT PRIMARY KEY,
     item_id INT NOT NULL,
-    discount_amount DECIMAL(5, 2) NOT NULL,
+    discount_amount_percentage DECIMAL(5, 2) NOT NULL,
     FOREIGN KEY (item_id) REFERENCES items(item_id) ON DELETE CASCADE
 );
 
-INSERT INTO ItemDiscounts (item_id, discount_amount)
+INSERT INTO ItemDiscounts (item_id, discount_amount_percentage)
 VALUES
 	(1, 5.00),
 	(2, 10.00);
