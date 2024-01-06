@@ -3,6 +3,7 @@ from app.JWT_auth.user_identification import UserIdentification
 from app.JWT_auth.authorization import authorization_wrapper
 from app.items.discount.model import ItemDiscountModel, ItemDiscountCreateModel
 import app.items.discount.db as discount_db
+import app.users.db as users_db
 from app.db_error_handler import handle_db_error
 import app.users.check as users_check
 
@@ -17,6 +18,10 @@ async def get_item_discounts(item_id: str, user_identification: UserIdentificati
 @router.post("/cinematic/items/{item_id}/discounts", tags=["discounts"], status_code=201)
 @handle_db_error
 async def create_item_discount(item_id: str, item_discount_data: ItemDiscountCreateModel = fastapi.Body(default=None), user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
+    
+    auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
+    users_check.is_employee_or_higher(user_company_data=auth_user_cd)
+    
     discount_db.post_item_discount(item_id, item_discount_data)
     return {"info": "item discount successfully created"}
 
@@ -24,6 +29,10 @@ async def create_item_discount(item_id: str, item_discount_data: ItemDiscountCre
 @router.put("/cinematic/items/discounts/{discount_id}", tags=["discounts"], status_code=200)
 @handle_db_error
 async def edit_item_discount(discount_id: str, item_discount_data: ItemDiscountCreateModel = fastapi.Body(default=None), user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
+    
+    auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
+    users_check.is_employee_or_higher(user_company_data=auth_user_cd)
+    
     discount_db.put_item_discount(discount_id, item_discount_data)
     return {"info": "item discount successfully updated"}
 
@@ -31,5 +40,9 @@ async def edit_item_discount(discount_id: str, item_discount_data: ItemDiscountC
 @router.delete("/cinematic/items/discounts/{discount_id}", tags=["discounts"], status_code=204)
 @handle_db_error
 async def delete_item_discount(discount_id: str, user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):    
+    
+    auth_user_cd = users_db.get_user_company_data(user_id=user_identification.id)
+    users_check.is_employee_or_higher(user_company_data=auth_user_cd)
+    
     discount_db.delete_item_discount(discount_id)
     return {"info": "item discount successfully deleted"}
