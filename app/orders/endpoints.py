@@ -1,11 +1,9 @@
 import fastapi
 from app.JWT_auth.user_identification import UserIdentification
-from app.JWT_auth.authorization import authorization_wrapper, get_complete_user_information
-from app.orders.model import DiscountModel, AddOrderItemModel, OrderPostModel, OrderStatuses, OrderUpdateModel
+from app.JWT_auth.authorization import authorization_wrapper
+from app.orders.model import AddOrderItemModel, OrderPostModel, OrderStatuses, OrderUpdateModel
 import app.orders.db as db
 from app.db_error_handler import handle_db_error
-import app.users.check as check
-from app.users.db import get_user_company_data
 
 router = fastapi.APIRouter()
 
@@ -38,11 +36,6 @@ async def delete_order(order_id : int, user_identification : UserIdentification 
 @handle_db_error
 async def update_order_status(order_id : int, new_status : OrderStatuses = fastapi.Body(OrderStatuses.CONFIRMED), user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
     return db.update_order_status(order_id, new_status, user_identification.id)
-
-@router.post("/cinematic/orders/{order_id}/discounts", tags=["orders"], status_code=201)
-@handle_db_error
-async def add_discount(discount : DiscountModel, user_identification : UserIdentification = fastapi.Depends(authorization_wrapper)):
-    return db.add_discount(discount, user_identification.id)
 
 @router.post("/cinematic/orders/{order_id}/assign", tags=["orders"], status_code=201)
 @handle_db_error
