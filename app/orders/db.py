@@ -1,12 +1,10 @@
 from datetime import datetime
 from fastapi import HTTPException
 from app.JWT_auth.authorization import get_complete_user_information
-from app.JWT_auth.user_identification import UserIdentification
 from app.db_connection import mysql_connection
 from app.orders.model import AddOrderItemModel, OrderModel, OrderPostModel, OrderStatuses, OrderUpdateModel
-from typing import List, Optional
+from typing import List
 
-from app.users.model import CompanyPositions
 from app.users.roles.access_handler import get_user_access
 
 def post_order(new_order: OrderPostModel, user_id):
