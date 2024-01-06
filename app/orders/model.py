@@ -61,24 +61,6 @@ class OrderUpdateModel(BaseModel):
         }
 
 
-class DiscountModel(BaseModel):
-    name : str
-    order_id : int
-    percentage_discount : Optional[float] = Field(default=None)
-    amount_discount : Optional[float] = Field(default=None)
-    created_at : datetime = Field(default_factory=lambda: datetime.now())
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "name": "10 euros discount",
-                "order_id": 1,
-                "percentage_discount": None,
-                "amount_discount": 10
-            }
-        }
-
-
 class AddOrderItemModel(BaseModel):
     item_id : int
     quantity : int

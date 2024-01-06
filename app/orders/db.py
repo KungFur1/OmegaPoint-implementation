@@ -3,7 +3,7 @@ from fastapi import HTTPException
 from app.JWT_auth.authorization import get_complete_user_information
 from app.JWT_auth.user_identification import UserIdentification
 from app.db_connection import mysql_connection
-from app.orders.model import DiscountModel, AddOrderItemModel, OrderModel, OrderPostModel, OrderStatuses, OrderUpdateModel
+from app.orders.model import AddOrderItemModel, OrderModel, OrderPostModel, OrderStatuses, OrderUpdateModel
 from typing import List, Optional
 
 from app.users.model import CompanyPositions
@@ -270,38 +270,6 @@ def update_order_status(order_id: int, new_status: OrderStatuses, user_id: int):
     connection.close()
 
     return {"info": "Order status updated", "order_id": order_id}
-
-
-def add_discount(discount: DiscountModel, user_id: int):
-    access = get_user_access(user_id)
-    if access.payments_manage is False:
-        raise HTTPException(status_code=401, detail="Unauthorized")
-    
-    connection = mysql_connection()
-    connection.start_transaction()
-    cursor = connection.cursor(buffered=True)
-
-    is_order_in_company(discount.order_id, user_id)
-
-    order_query = "SELECT id FROM orders WHERE id = %s"
-    cursor.execute(order_query, (discount.order_id,))
-
-    discount_query = (
-        "INSERT INTO discounts (name, order_id, percentage_discount, amount_discount, created_at) "
-        "VALUES (%s, %s, %s, %s, %s)"
-    )
-    discount_values = (discount.name, discount.order_id, discount.percentage_discount, discount.amount_discount, discount.created_at)
-    cursor.execute(discount_query, discount_values)
-    
-    discount_id = cursor.lastrowid
-
-    connection.commit()
-    cursor.close()
-    connection.disconnect()
-    connection.close()
-    
-    return {"info": "Discount created", "discount_id": discount_id}
-        
 
 
 def assign_order(order_id: int, assignee_id: int, user_id: int):
