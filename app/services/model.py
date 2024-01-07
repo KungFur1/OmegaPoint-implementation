@@ -37,4 +37,5 @@ class ServiceAvailabilityModel(BaseModel):
     start_date: datetime
     end_date: datetime
     
+    
 

@@ -23,6 +23,19 @@ class AppointmentPostModel(BaseModel):
     end_time: time
     price: float
     
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "service_id" : "1",
+                "company_id" : "1",
+                "user_id" : "1",
+                "appointment_date" : "2024-01-01",
+                "start_time" : "00:00:00",
+                "end_time" : "00:00:00",
+                "price" : 0,
+            }
+        }
+    
 class AppointmentUpdateModel(BaseModel):
     service_id: Optional[int] = Field(default = None)
     user_id: Optional[int] = Field(default = None)
@@ -30,6 +43,18 @@ class AppointmentUpdateModel(BaseModel):
     start_time: Optional[time] = Field(default = None)
     end_time: Optional[time] = Field(default = None)
     price: Optional[float] = Field(default = None)
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "service_id" : "1",
+                "user_id" : "1",
+                "appointment_date" : "2024-01-01",
+                "start_time" : "00:00:00",
+                "end_time" : "00:00:00",
+                "price" : 0,
+            }
+        }
 
 class AppointmentsList(BaseModel):
     id: int = Field(default=None)
