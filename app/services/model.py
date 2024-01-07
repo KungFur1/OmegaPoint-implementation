@@ -8,7 +8,6 @@ class ServiceModel(BaseModel):
     company_id: int
     description: str
     price: float
-    time: int
     created_at : datetime = Field(default = None)
 
 class ServicePostModel(BaseModel):
@@ -16,7 +15,6 @@ class ServicePostModel(BaseModel):
     company_id: int
     description: str
     price: float
-    time: int
 
     class Config:
         json_schema_extra = {
@@ -25,7 +23,6 @@ class ServicePostModel(BaseModel):
                 "company_id" : "1",
                 "description" : "Service description",
                 "price" : 10.88,
-                "time" : 20
             }
         }
     
@@ -33,7 +30,6 @@ class ServiceUpdateModel(BaseModel):
     name: Optional[str] = Field(default = None)
     description: Optional[str] = Field(default = None)
     price: Optional[float] = Field(default = None)
-    time: Optional[int] = Field(default = None)
     
 
 class ServiceAvailabilityModel(BaseModel):

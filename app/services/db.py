@@ -8,25 +8,25 @@ connection = mysql_connection()
 
 
 def get_all_services_for_company(company_id: int) -> List[ServiceModel]:
-    query = "SELECT id, name, company_id, description, price,time, created_at FROM services"
+    query = "SELECT id, name, company_id, description, price, created_at FROM services"
     cursor = connection.cursor()
     cursor.execute(query,)
     rows = cursor.fetchall()
     cursor.close()
-    return [ServiceModel(id = row[0],name = row[1],company_id = row[2], description = row[3], price = row[4], time = row[5], created_at= row[6]) for row in rows]
+    return [ServiceModel(id = row[0],name = row[1],company_id = row[2], description = row[3], price = row[4], created_at= row[5]) for row in rows]
 
 def get_service_by_id(service_id: int) -> Optional[ServiceModel]:
-    query = "SELECT id, name, company_id, description, price, time, created_at FROM services WHERE id = %s"
+    query = "SELECT id, name, company_id, description, price, created_at FROM services WHERE id = %s"
     cursor = connection.cursor()
     cursor.execute(query,(service_id,))
     row = cursor.fetchone()
     cursor.close()
-    return ServiceModel(id = row[0],name = row[1],company_id = row[2], description= row [3], price = row[4], time = row [5], created_at= row[6]) if row else None
+    return ServiceModel(id = row[0],name = row[1],company_id = row[2], description= row [3], price = row[4], created_at= row[5]) if row else None
 
 def create_service(service_data: ServicePostModel):
 
-        query = "INSERT INTO services (name,company_id,description,price,time) VALUES (%s,%s,%s,%s,%s)"
-        values = (service_data.name,service_data.company_id,service_data.description,service_data.price, service_data.time)
+        query = "INSERT INTO services (name,company_id,description,price) VALUES (%s,%s,%s,%s)"
+        values = (service_data.name,service_data.company_id,service_data.description,service_data.price)
         cursor = connection.cursor()
         cursor.execute(query,values)
         connection.commit()
@@ -45,9 +45,6 @@ def update_service(service_id: int, service: ServiceUpdateModel) -> bool:
     if service.price is not None:
         updates.append("price = %s")
         values.append(service.price)
-    if service.time is not None:
-        updates.append("time = %s")
-        values.append(service.time)
     if not updates:
         return False
     

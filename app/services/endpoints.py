@@ -41,7 +41,7 @@ async def update_service_details(service_id: int, service_data: ServiceUpdateMod
     db.update_service(service_id,service_data)
     return {"info": "Service successfully updated"}
 
-@router.delete("/cinematic/services/{service_id}", tags = ["services"], status_code=204)
+@router.delete("/cinematic/services/{service_id}", tags = ["services"], status_code=200)
 @handle_db_error
 async def delete_service_endpoint(service_id: int, user_identification: UserIdentification = fastapi.Depends(authorization_wrapper)):
 
