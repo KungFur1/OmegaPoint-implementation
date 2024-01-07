@@ -22,20 +22,20 @@ class OrderModel(BaseModel):
     status : OrderStatuses
 
 class OrderPostModel(BaseModel):
+    company_id : int
     assignee_id : Optional[int] = Field(default=None)
     products: List[int]
     quantities: List[int] 
     created_at : datetime = Field(default_factory=lambda: datetime.now())
-    status : OrderStatuses
+    status : OrderStatuses = Field(default=OrderStatuses.PENDING.value)
 
     class Config:
         use_enum_values = True
         json_schema_extra = {
             "example": {
-                "assignee_id": None,
+                "company_id": 1,
                 "products": [1, 5],
                 "quantities": [5, 3], 
-                "status": OrderStatuses.PENDING
             }
         }
 
