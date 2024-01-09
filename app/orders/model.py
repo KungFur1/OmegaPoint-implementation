@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import List, Optional
 from enum import Enum
@@ -57,24 +57,6 @@ class OrderUpdateModel(BaseModel):
                 "products": [1, 5],
                 "quantities": [5, 3], 
                 "status": OrderStatuses.PENDING
-            }
-        }
-
-
-class DiscountModel(BaseModel):
-    name : str
-    order_id : int
-    percentage_discount : Optional[float] = Field(default=None)
-    amount_discount : Optional[float] = Field(default=None)
-    created_at : datetime = Field(default_factory=lambda: datetime.now())
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "name": "10 euros discount",
-                "order_id": 1,
-                "percentage_discount": None,
-                "amount_discount": 10
             }
         }
 
