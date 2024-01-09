@@ -12,6 +12,7 @@ class ServiceModel(BaseModel):
 
 class ServicePostModel(BaseModel):
     name: str
+    company_id: int
     description: str
     price: float
 
@@ -19,8 +20,9 @@ class ServicePostModel(BaseModel):
         json_schema_extra = {
             "example": {
                 "name" : "serviceName",
+                "company_id" : "1",
                 "description" : "Service description",
-                "price" : 10.88
+                "price" : 10.88,
             }
         }
     
@@ -28,4 +30,12 @@ class ServiceUpdateModel(BaseModel):
     name: Optional[str] = Field(default = None)
     description: Optional[str] = Field(default = None)
     price: Optional[float] = Field(default = None)
+    
+
+class ServiceAvailabilityModel(BaseModel):
+    service_id: int 
+    start_date: datetime
+    end_date: datetime
+    
+    
 
