@@ -92,3 +92,9 @@ Some endpoints have overlapping structure. Therefore, they will be structured to
 * `POST /cinematic/inventory` - Create inventory, accessible by managers and employees only.
 * `PUT /cinematic/inventory/{inventory_id}` - Edit inventory details, accessible by managers and employees only.
 * `DELETE /cinematic/inventory/{inventory_id}` - Delete inventory, accessible by managers and employees only.
+
+### Payment endpoints
+* `POST /cinematic/payments` - Process a new payment transaction.
+* `GET /cinematic/payments/{payment_id}/receipts` - Generate a detailed receipt for a specified payment.
+* `POST /cinematic/payments/{payment_id}/refunds` - Handle refunds for completed payments.
+* `POST /cinematic/payments/{payment_id}/void` - Void pending payments.

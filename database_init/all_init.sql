@@ -293,3 +293,21 @@ INSERT INTO appointments(service_id,company_id,user_id,appointment_date,price) V
 (1,1,1,'2024-01-10 17:00:00',15.50),
 (1,1,1,'2024-01-11 10:15:00',9.99),
 (1,1,1,'2024-01-12 09:45:00',16.54);
+
+
+-- PAYMENTS
+
+CREATE TABLE IF NOT EXISTS payments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  order_id INT NOT NULL,
+  user_id INT NOT NULL,
+  amount DECIMAL(10, 2) NOT NULL,
+  tip DECIMAL(10, 2) DEFAULT 0.00,
+  discount_percentage DECIMAL(5, 2) DEFAULT 0.00,  
+  payment_method VARCHAR(50) NOT NULL,  
+  payment_status INT NOT NULL,  
+  created_at DATETIME NOT NULL,
+  updated_at DATETIME,
+  FOREIGN KEY (order_id) REFERENCES orders(id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
