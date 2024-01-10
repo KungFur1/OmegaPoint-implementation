@@ -42,6 +42,7 @@ from app.orders.endpoints import router as orders_router
 from app.items.item.endpoints import router as item_router 
 from app.items.discount.endpoints import router as discount_router 
 from app.items.inventory.endpoints import router as inventory_router
+from app.payments.endpoints import router as payments_router
 
 
 app = fastapi.FastAPI()
@@ -58,3 +59,4 @@ app.include_router(orders_router)
 app.include_router(item_router) 
 app.include_router(discount_router) 
 app.include_router(inventory_router) 
+app.include_router(payments_router)

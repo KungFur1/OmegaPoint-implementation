@@ -269,6 +269,20 @@ INSERT INTO services (company_id,name,description,price) VALUES
 (1,'Name4','Description 4', 9.99),
 (1,'Name5','Description 5', 16.54);
 
+CREATE TABLE IF NOT EXISTS service_availability (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    service_id INT NOT NULL,
+    start_date DATETIME NOT NULL,
+    end_date DATETIME NOT NULL,
+    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
+);
+
+INSERT INTO service_availability (service_id,start_date,end_date) VALUES
+(1,'2024-01-08 08:00:00', '2024-01-08 16:00:00'),
+(2,'2024-01-10 11:00:00', '2024-01-08 20:30:00'),
+(3,'2024-01-20 7:30:00', '2024-01-20 15:30:00');
+
+
 
 -- APPOINTMENTS
 
@@ -278,18 +292,37 @@ CREATE TABLE IF NOT EXISTS appointments(
     service_id INT NOT NULL,
     company_id INT NOT NULL,
     user_id INT NOT NULL,
-    appointment_date DATETIME NOT NULL,
+    appointment_date DATE,
+    start_time varchar(200) NOT NULL,
+    end_time varchar(200) NOT NULL,
     price DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (company_id) REFERENCES company(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+INSERT INTO appointments(service_id,company_id,user_id,appointment_date,start_time, end_time,price) VALUES
+(1,1,1,'2024-01-08','14:30:00','15:00:00',10.00),
+(1,1,1,'2024-01-09','16:00:00','16:30:00',100.00),
+(1,1,1,'2024-01-10','16:30:00','17:00:00',15.50),
+(1,1,1,'2024-01-11','10:00:00','10:15:00',9.99),
+(1,1,1,'2024-01-12','09:00:00','09:45:00',16.54);
 
-INSERT INTO appointments(service_id,company_id,user_id,appointment_date,price) VALUES
-(1,1,1,'2024-01-08 15:00:00',10.00),
-(1,1,1,'2024-01-09 16:30:00',100.00),
-(1,1,1,'2024-01-10 17:00:00',15.50),
-(1,1,1,'2024-01-11 10:15:00',9.99),
-(1,1,1,'2024-01-12 09:45:00',16.54);
+
+-- PAYMENTS
+
+CREATE TABLE IF NOT EXISTS payments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  order_id INT NOT NULL,
+  user_id INT NOT NULL,
+  amount DECIMAL(10, 2) NOT NULL,
+  tip DECIMAL(10, 2) DEFAULT 0.00,
+  discount_percentage DECIMAL(5, 2) DEFAULT 0.00,  
+  payment_method VARCHAR(50) NOT NULL,  
+  payment_status INT NOT NULL,  
+  created_at DATETIME NOT NULL,
+  updated_at DATETIME,
+  FOREIGN KEY (order_id) REFERENCES orders(id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
