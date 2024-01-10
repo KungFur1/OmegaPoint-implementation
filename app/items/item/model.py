@@ -13,7 +13,7 @@ class ItemModel(BaseModel):
 
 
 class ItemCreateModel(BaseModel):
-    company_id: int
+    # company_id: int
     name: str
     description: str
     price: float
@@ -22,7 +22,7 @@ class ItemCreateModel(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "company_id": 1,
+                # "company_id": 1,
                 "name": "Item x",
                 "description": "Description x",
                 "price": 10,

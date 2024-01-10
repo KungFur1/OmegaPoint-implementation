@@ -5,9 +5,9 @@ from typing import List, Optional
 connection = mysql_connection()
 
 
-def post_item(item: ItemCreateModel):
+def post_item(item: ItemCreateModel, company_id : int):
     query = "INSERT INTO items (company_id, name, description, price, tax_percentage) VALUES (%s, %s, %s, %s, %s)"
-    values = (item.company_id, item.name, item.description, item.price, item.tax_percentage)
+    values = (company_id, item.name, item.description, item.price, item.tax_percentage)
     cursor = connection.cursor()
     cursor.execute(query, values)
     connection.commit()
@@ -55,10 +55,10 @@ def delete_item(item_id: int) -> bool:
     return affected_rows > 0
 
 
-def get_all_items() -> List[ItemModel]:
-    query = "SELECT item_id, company_id, name, description, price, tax_percentage FROM items"
+def get_all_items(company_id: int) -> List[ItemModel]:
+    query = "SELECT item_id, company_id, name, description, price, tax_percentage FROM items WHERE company_id = %s"
     cursor = connection.cursor()
-    cursor.execute(query)
+    cursor.execute(query, (company_id,))
     rows = cursor.fetchall()
     cursor.close()
     items = []
@@ -68,10 +68,10 @@ def get_all_items() -> List[ItemModel]:
     return items
 
 
-def get_item_by_id(item_id: int) -> Optional[ItemModel]:
-    query = "SELECT item_id, company_id, name, description, price, tax_percentage FROM items WHERE item_id = %s"
+def get_item_by_id(item_id: int, company_id: int) -> Optional[ItemModel]:
+    query = "SELECT item_id, company_id, name, description, price, tax_percentage FROM items WHERE company_id = %s AND item_id = %s"
     cursor = connection.cursor()
-    cursor.execute(query, (item_id,))
+    cursor.execute(query, (company_id, item_id))
     result = cursor.fetchone()
     cursor.close()
     if result:
