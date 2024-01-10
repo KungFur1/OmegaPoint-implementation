@@ -8,54 +8,59 @@ from typing import List
 from app.users.roles.access_handler import get_user_access
 
 def post_order(new_order: OrderPostModel, user_id):
+    access = get_user_access(user_id)
+    if access.items_manage is False:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
     connection = mysql_connection()
     # Start a transaction
     connection.start_transaction()
     cursor = connection.cursor(buffered=True)
-    try:
-        format_strings = ','.join(['%s'] * len(new_order.products))
-        price_query = f"SELECT item_id, price FROM items WHERE item_id IN ({format_strings})"
-        price_cursor = connection.cursor(buffered=True)
-        # Execute the query with the list of product IDs
-        price_cursor.execute(price_query, tuple(new_order.products))
 
-        # Fetch the prices
-        prices = {id: price for id, price in price_cursor.fetchall()}
-        price_cursor.close()
+    format_strings = ','.join(['%s'] * len(new_order.products))
+    price_query = f"SELECT item_id, price FROM items WHERE item_id IN ({format_strings})"
+    price_cursor = connection.cursor(buffered=True)
+    # Execute the query with the list of product IDs
+    price_cursor.execute(price_query, tuple(new_order.products))
 
-        total_price = sum(prices[item_id] * quantity for item_id, quantity in zip(new_order.products, new_order.quantities))
+    # Fetch the prices
+    prices = {id: price for id, price in price_cursor.fetchall()}
+    price_cursor.close()
 
-        order_query = (
-            "INSERT INTO orders (user_id, company_id, total_price, created_at, status) "
-            "VALUES (%s, %s, %s, %s, %s)"
-        )
-        order_values = (user_id, new_order.company_id, total_price, new_order.created_at, new_order.status)
-        cursor.execute(order_query, order_values)
+    total_price = sum(prices[item_id] * quantity for item_id, quantity in zip(new_order.products, new_order.quantities))
+    company_id = get_complete_user_information(user_id).company_id
+
+    order_query = (
+        "INSERT INTO orders (user_id, company_id, total_price, created_at, status) "
+        "VALUES (%s, %s, %s, %s, %s)"
+    )
+    order_values = (user_id, company_id, total_price, new_order.created_at, new_order.status)
+    cursor.execute(order_query, order_values)
+    
+    order_id = cursor.lastrowid
+
+    item_query = (
+        "INSERT INTO order_item (order_id, item_id, quantity) "
+        "VALUES (%s, %s, %s)"
+    )
+    for item_id, quantity in zip(new_order.products, new_order.quantities):
+        cursor.execute(item_query, (order_id, item_id, quantity))
+
+    connection.commit()
+    connection.disconnect()
+    connection.close()
+    cursor.close()
+
+    return {"info": "Order and order items created", "order_id": order_id}
         
-        order_id = cursor.lastrowid
-
-        item_query = (
-            "INSERT INTO order_item (order_id, item_id, quantity) "
-            "VALUES (%s, %s, %s)"
-        )
-        for item_id, quantity in zip(new_order.products, new_order.quantities):
-            cursor.execute(item_query, (order_id, item_id, quantity))
-
-        connection.commit()
-        return {"info": "Order and order items created", "order_id": order_id}
-
-    except Exception as e:
-        connection.rollback()
-        return {"error": str(e)}
-    finally:
-        connection.disconnect()
-        connection.close()
-        cursor.close()
 
 
 def get_orders(user_id: int) -> List[OrderModel]:
-    connection = mysql_connection()
+    access = get_user_access(user_id)
+    if access.items_read is False:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
+    connection = mysql_connection()
     company_id = get_complete_user_information(user_id).company_id
     if company_id is None:
         id = ("user_id", user_id)
@@ -112,9 +117,13 @@ def get_orders(user_id: int) -> List[OrderModel]:
 
 
 def get_order(order_id: int, user_id: int) -> OrderModel | None:
+    access = get_user_access(user_id)
+    if access.items_read is False:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     connection = mysql_connection()
-
     company_id = get_complete_user_information(user_id).company_id
+
     if company_id is None:
         id = ("user_id", user_id)
         query = "SELECT id, user_id, assignee_id, company_id, total_price, created_at, updated_at, status FROM orders WHERE user_id = %s AND id = %s"
@@ -163,7 +172,7 @@ def get_order(order_id: int, user_id: int) -> OrderModel | None:
         connection.disconnect()
         connection.close()
 
-# ! Employee only
+
 def update_order(order_id: int, new_order: OrderUpdateModel, user_id: int):
     access = get_user_access(user_id)
     if access.payments_manage is False:
@@ -187,10 +196,10 @@ def update_order(order_id: int, new_order: OrderUpdateModel, user_id: int):
     total_price = sum(prices[item_id] * quantity for item_id, quantity in zip(new_order.products, new_order.quantities))
 
     order_query = (
-        "UPDATE orders SET company_id = %s, assignee_id = %s, total_price = %s, updated_at = %s, status = %s "
+        "UPDATE orders SET assignee_id = %s, total_price = %s, updated_at = %s, status = %s "
         "WHERE id = %s"
     )
-    order_values = (new_order.company_id, new_order.assignee_id, total_price, new_order.updated_at, new_order.status, order_id)
+    order_values = (new_order.assignee_id, total_price, new_order.updated_at, new_order.status, order_id)
     cursor.execute(order_query, order_values)
     
     item_query = (
