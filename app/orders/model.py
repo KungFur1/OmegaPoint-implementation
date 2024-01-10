@@ -8,6 +8,9 @@ class OrderStatuses(Enum):
     CONFIRMED = 2
     DELIVERED = 3
     CANCELLED = 4
+    PAID = 5
+    REFUNDED = 6
+    VOIDED = 7    
 
 class OrderModel(BaseModel):
     id : int
