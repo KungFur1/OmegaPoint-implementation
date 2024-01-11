@@ -5,8 +5,8 @@ from typing import List, Optional
 connection = mysql_connection()
 
 def post_item_discount(item_id: int, discount: ItemDiscountCreateModel):
-    query = "INSERT INTO ItemDiscounts (item_id, discount_amount) VALUES (%s, %s)"
-    values = (item_id, discount.discount_amount)
+    query = "INSERT INTO ItemDiscounts (item_id, discount_amount_percentage) VALUES (%s, %s)"
+    values = (item_id, discount.discount_amount_percentage)
     cursor = connection.cursor()
     cursor.execute(query, values)
     connection.commit()
@@ -14,8 +14,8 @@ def post_item_discount(item_id: int, discount: ItemDiscountCreateModel):
 
 
 def put_item_discount(discount_id: int, discount: ItemDiscountCreateModel) -> bool:
-    query = "UPDATE ItemDiscounts SET discount_amount = %s WHERE discount_id = %s"
-    values = (discount.discount_amount, discount_id)
+    query = "UPDATE ItemDiscounts SET discount_amount_percentage = %s WHERE discount_id = %s"
+    values = (discount.discount_amount_percentage, discount_id)
     cursor = connection.cursor()
     cursor.execute(query, values)
     connection.commit()
@@ -36,13 +36,13 @@ def delete_item_discount(discount_id: int) -> bool:
 
 
 def get_item_discounts(item_id: int) -> List[ItemDiscountModel]:
-    query = "SELECT discount_id, item_id, discount_amount FROM ItemDiscounts WHERE item_id = %s"
+    query = "SELECT discount_id, item_id, discount_amount_percentage FROM ItemDiscounts WHERE item_id = %s"
     cursor = connection.cursor()
     cursor.execute(query, (item_id,))
     rows = cursor.fetchall()
     cursor.close()
     discounts = []
     for row in rows:
-        discount = ItemDiscountModel(discount_id=row[0], item_id=row[1], discount_amount=row[2])
+        discount = ItemDiscountModel(discount_id=row[0], item_id=row[1], discount_amount_percentage=row[2])
         discounts.append(discount)
     return discounts
