@@ -335,12 +335,14 @@ def add_order_item(order_id, order_item: AddOrderItemModel, user_id: int):
     price = cursor.fetchone()[0]
     order_item_price = price * order_item.quantity
 
+    updated_at = datetime.now()
+
     # Update the total price of the order
     order_query = (
-        "UPDATE orders SET total_price = total_price + %s "
+        "UPDATE orders SET total_price = total_price + %s, updated_at = %s "
         "WHERE id = %s"
     )
-    order_values = (order_item_price, order_id)
+    order_values = (order_item_price, updated_at, order_id)
     cursor.execute(order_query, order_values)
 
     item_query = (
